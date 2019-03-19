@@ -13,7 +13,8 @@ class rule(object):
         self.optional = optional
 
     def to_string(self, indent=0):
-        return "%s%s%s[%s](%s%s)%s" % ("\n" if indent else "", " "*indent, self.tag, self.attribute, "".join(n.to_string(indent+2) for n in self.nodes), ("\n" + " "*indent) if len(self.nodes) else "", (" -> %s" % self.bind) if self.bind else "")
+        # return "%s%s%s[%s](%s%s)%s" % ("\n" if indent else "", " "*indent, self.tag, self.attribute, "".join(n.to_string(indent+2) for n in self.nodes), ("\n" + " "*indent) if len(self.nodes) else "", (" -> %s" % self.bind) if self.bind else "")
+        return "<Rule %s %s>" % (self.tag, self.attribute)
 
     def __repr__(self):
         return self.to_string()
@@ -23,39 +24,40 @@ class template(object):
     Representation of an mvdXML template
     """
 
-    def __init__(self, concept, root, params=None, rules=None):
-        self.concept, self.root, self.params = concept, root, params
+    def __init__(self, concept, root, constraints=None, rules=None):
+        self.concept, self.root, self.constraints = concept, root, (constraints or [])
         self.rules = rules or []
         self.entity = str(root.attributes['applicableEntity'].value)
-        self.name = root.attributes['name'].value
+        try:
+            self.name = root.attributes['name'].value
+        except:
+            self.name = None
         
-    def bind(self, params):
-        return template(self.concept, self.root, params, self.rules)
+    def bind(self, constraints):
+        return template(self.concept, self.root, constraints, self.rules)
         
     def parse(self):
-        for rules in self.root.childNodes:
-            if not isinstance(rules, Element): continue
-            
+        for rules in self.root.getElementsByTagName("Rules"):
             for r in rules.childNodes:
                 if not isinstance(r, Element): continue
                 self.rules.append(self.parse_rule(r))
 
                 
     def traverse(self, fn, root=None, with_parents=False):
-        def _(n, p=root, ps=[root]):
+        def visit(n, p=root, ps=[root]):
             if with_parents:
                 close = fn(rule=n, parents=ps)
             else:
                 close = fn(rule=n, parent=p)
 
             for s in n.nodes:
-                _(s, n, ps + [n])
+                visit(s, n, ps + [n])
 
             if close:
                 close()
 
         for r in self.rules:
-            _(r)
+            visit(r)
                 
     def parse_rule(self, root):
         def visit(node, prefix=""):
@@ -89,6 +91,8 @@ class template(object):
                 n = self.concept.template(ref).root
                 try: p = p + node.attributes["IdPrefix"].value
                 except: pass
+            elif node.tagName == "Constraint":
+                r = mvdxml_expression.parse(node.attributes["Expression"].value)
                 
             def _(n):
                 for subnode in n.childNodes:
@@ -133,7 +137,10 @@ class concept_or_applicability(object):
 
     def rules(self):
         # Get the top most TemplateRule and traverse
-        rules = self.concept_node.getElementsByTagName("TemplateRules")[0]
+        try:
+            rules = self.concept_node.getElementsByTagName("TemplateRules")[0]
+        except:
+            return []
 
         def visit(rules):
             def _():
@@ -167,15 +174,15 @@ class concept_root(object):
     @staticmethod
     def parse(fn):
         dom = parse(fn)
-        try:
-            root = dom.getElementsByTagName("ConceptRoot")[0]
-            CR = concept_root(dom, root)
-            return CR
-        except:
-            root = dom.getElementsByTagName("ConceptTemplate")[0]
-            t = template(None, root)
-            t.parse()
-            return t
+        if len(dom.getElementsByTagName("ConceptRoot")):
+            for root in dom.getElementsByTagName("ConceptRoot"):
+                CR = concept_root(dom, root)
+                yield CR
+        else:
+            for templ in dom.getElementsByTagName("ConceptTemplate"):
+                t = template(None, templ)
+                t.parse()
+                yield t
 
 
 if __name__ == "__main__":
@@ -202,6 +209,6 @@ if __name__ == "__main__":
             t = c.template()
             print("RootEntity", t.entity)
             t.traverse(dump, with_parents=True)
-            print(" ".join(map(str, t.params)))
+            print(" ".join(map(str, t.constraints)))
 
             print()
