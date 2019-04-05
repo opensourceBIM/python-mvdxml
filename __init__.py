@@ -1,4 +1,3 @@
-import sys
 from  . import mvdxml_expression
 
 from xml.dom.minidom import parse, Element
@@ -183,32 +182,3 @@ class concept_root(object):
                 t = template(None, templ)
                 t.parse()
                 yield t
-
-
-if __name__ == "__main__":
-
-    if len(sys.argv) == 3:
-        from . import sparql
-        ttlfn, mvdfn = sys.argv[1:]
-        sparql.derive_prefix(ttlfn)
-        ttlfn = sparql.infer_subtypes(ttlfn)
-        MVD = concept_root.parse(mvdfn)
-        sparql.executor.run(MVD, mvdfn, ttlfn)
-
-    else:
-        mvdfn = sys.argv[1]
-        MVD = concept_root.parse(mvdfn)
-
-        def dump(rule, parents):
-            print(" " * len(parents), rule.tag, rule.attribute)
-
-        for c in MVD.concepts():
-            print(c.name)
-            print()
-
-            t = c.template()
-            print("RootEntity", t.entity)
-            t.traverse(dump, with_parents=True)
-            print(" ".join(map(str, t.constraints)))
-
-            print()
