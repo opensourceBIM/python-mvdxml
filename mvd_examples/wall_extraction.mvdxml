@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<mvdXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" uuid="b4b7c35a-f8e7-468f-ab57-822fc0750dc8" name="" status="sample" xsi:schemaLocation="http://www.buildingsmart-tech.org/mvd/XML/1.1 http://www.buildingsmart-tech.org/mvd/XML/1.1/mvdXML_V1.1_add1.xsd" xmlns="http://buildingsmart-tech.org/mvd/XML/1.1">
+  <Templates>
+    <ConceptTemplate uuid="d862db8a-fdc4-4d1d-9934-cddee2ae2a88" name="IsExternal" status="sample" applicableSchema="IFC4" applicableEntity="IfcWall">
+      <Rules>
+        <AttributeRule AttributeName="IsDefinedBy">
+          <EntityRules>
+            <EntityRule EntityName="IfcRelDefinesByProperties">
+              <AttributeRules>
+                <AttributeRule AttributeName="RelatingPropertyDefinition">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcPropertySet">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="Name">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcLabel">
+                              <Constraints>
+                                <Constraint Expression="[Value] = 'Pset_WallCommon'" />
+                              </Constraints>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                        <AttributeRule AttributeName="HasProperties">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcPropertySingleValue">
+                              <AttributeRules>
+                                <AttributeRule AttributeName="Name">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcIdentifier">
+                                      <Constraints>
+                                        <Constraint Expression="[Value] = 'IsExternal'" />
+                                      </Constraints>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule AttributeName="NominalValue">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcBoolean">
+                                      <Constraints>
+                                        <Constraint Expression="[Value] = 'True'" />
+                                      </Constraints>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </AttributeRules>
+            </EntityRule>
+          </EntityRules>
+        </AttributeRule>
+        <AttributeRule AttributeName="Name">
+          <EntityRules>
+            <EntityRule EntityName="IfcLabel" />
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="57879083-3675-4fe0-b0f1-9d17a6a4dcb6" name="Name" status="sample" applicableSchema="IFC4" applicableEntity="IfcRoot">
+      <Rules>
+        <AttributeRule AttributeName="Name">
+          <EntityRules>
+            <EntityRule EntityName="IfcLabel" />
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="f99fe764-9732-4029-955e-08c51dd854e3" name="MaterialLayer" status="sample" applicableSchema="IFC4" applicableEntity="IfcWall">
+      <Rules>
+        <AttributeRule AttributeName="HasAssociations">
+          <EntityRules>
+            <EntityRule EntityName="IfcRelAssociatesMaterial">
+              <AttributeRules>
+                <AttributeRule AttributeName="RelatingMaterial">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcMaterialLayerSetUsage">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="ForLayerSet">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcMaterialLayerSet">
+                              <AttributeRules>
+                                <AttributeRule AttributeName="MaterialLayers">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcMaterialLayer">
+                                      <AttributeRules>
+                                        <AttributeRule AttributeName="LayerThickness">
+                                          <EntityRules>
+                                            <EntityRule EntityName="IfcNonNegativeLengthMeasure" />
+                                          </EntityRules>
+                                        </AttributeRule>
+                                      </AttributeRules>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </AttributeRules>
+            </EntityRule>
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="96ae8928-8f91-4768-bd40-89a89d6c6fc8" name="HasOpenings" status="sample" applicableSchema="IFC4" applicableEntity="IfcWall">
+      <Rules>
+        <AttributeRule AttributeName="HasOpenings">
+          <EntityRules>
+            <EntityRule EntityName="IfcRelVoidsElement">
+              <AttributeRules>
+                <AttributeRule AttributeName="GlobalId">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcGloballyUniqueId" />
+                  </EntityRules>
+                </AttributeRule>
+              </AttributeRules>
+            </EntityRule>
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="b6b5f23a-efc8-4b0a-96d5-f8adbddc8796" name="TemplateDefinition2" status="sample" applicableSchema="IFC4" applicableEntity="IfcWall">
+      <Rules>
+        <AttributeRule AttributeName="IsDefinedBy">
+          <EntityRules>
+            <EntityRule EntityName="IfcRelDefinesByProperties">
+              <AttributeRules>
+                <AttributeRule AttributeName="RelatingPropertyDefinition">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcPropertySet">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="HasProperties">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcPropertySingleValue">
+                              <AttributeRules>
+                                <AttributeRule AttributeName="NominalValue">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcAreaMeasure" />
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule AttributeName="Name">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcIdentifier">
+                                      <Constraints>
+                                        <Constraint Expression="[Value] = 'Area'" />
+                                      </Constraints>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                        <AttributeRule AttributeName="Name">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcLabel">
+                              <Constraints>
+                                <Constraint Expression="[Value] = 'PSet_Revit_Dimensions'" />
+                              </Constraints>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </AttributeRules>
+            </EntityRule>
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid="cb00b001-d3d4-4e6a-8c1a-f97526c8d227" name="Wall_Extraction" status="sample" applicableSchema="IFC4">
+      <ExchangeRequirements />
+      <Roots>
+        <ConceptRoot uuid="9c5337ac-83db-4ef3-92fc-086d03dfc521" name="IfcWall" status="proposal" applicableRootEntity="IfcWall">
+          <Applicability uuid="00000000-0000-0000-0000-000000000000" status="sample">
+            <Template ref="96ae8928-8f91-4768-bd40-89a89d6c6fc8" />
+            <TemplateRules operator="and" />
+          </Applicability>
+          <Concepts>
+            <Concept uuid="eaf87838-a06e-4b64-bbd7-bed4d455e825" name="APexternal" status="sample" override="false">
+              <Template ref="d862db8a-fdc4-4d1d-9934-cddee2ae2a88" />
+            </Concept>
+            <Concept uuid="e2f1ffad-4509-489c-a294-81909060e2e9" name="voids" status="sample" override="false">
+              <Template ref="96ae8928-8f91-4768-bd40-89a89d6c6fc8" />
+            </Concept>
+            <Concept uuid="9325e5cb-45d1-4c35-8925-d70409fe6685" name="mat" status="sample" override="false">
+              <Template ref="f99fe764-9732-4029-955e-08c51dd854e3" />
+            </Concept>
+            <Concept uuid="ecb11482-1b53-4853-9674-d3069b45a7ca" name="name" status="sample" override="false">
+              <Template ref="57879083-3675-4fe0-b0f1-9d17a6a4dcb6" />
+            </Concept>
+            <Concept uuid="c93399aa-c032-4f0e-883b-2d41783fa94d" name="area" status="sample" override="false">
+              <Template ref="b6b5f23a-efc8-4b0a-96d5-f8adbddc8796" />
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>
