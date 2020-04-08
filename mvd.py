@@ -71,7 +71,10 @@ def extract_data(mvd_node, ifc_data):
                 on_node = child.attribute[0].c
                 on_node = on_node.replace("'", "")
                 if isinstance(ifc_data, ifcopenshell.entity_instance):
-                    if str(ifc_data[0]) == on_node:
+                    ifc_type = type(ifc_data[0])
+                    typed_node = (ifc_type)(on_node)
+
+                    if ifc_data[0] == typed_node:
                         return [{mvd_node: ifc_data}]
 
                 elif ifc_data == on_node:
@@ -94,6 +97,7 @@ def open_mvd(filename):
     """
     my_concept_object = list(ifcopenshell.mvd.concept_root.parse(filename))[0]
     return my_concept_object
+
 
 def format_data_from_nodes(recurse_output):
     """
@@ -256,7 +260,6 @@ def get_data(mvd_concept, ifc_file, spreadsheet_export=True):
 
     """
 
-
     # Check if IFC entities have been filtered at least once
     filtered = 0
 
@@ -296,9 +299,8 @@ def get_data(mvd_concept, ifc_file, spreadsheet_export=True):
                 val = 0
                 if entity in not_respecting_entities:
                     val = 1
-                verification_matrix[entity.GlobalId].update({concept.name:val})
+                verification_matrix[entity.GlobalId].update({concept.name: val})
         counter += 1
-
 
     all_data = correct_for_export(all_data)
 
@@ -310,32 +312,18 @@ def get_data(mvd_concept, ifc_file, spreadsheet_export=True):
         export_to_xlsx(export_name + '.xlsx', concepts, all_data)
         export_to_csv(export_name + '.csv', concepts, all_data)
 
-    if filtered:
-        filtered_entities = []
-        for k,v in verification_matrix.items():
-            # print("K", k)
-            ent = ifc_file.by_id(k)
-            # print(ent)
-            # print("V ",v)
-            sum_result = 0
-            if sum(v.values()) > 0:
-                filtered_entities.append(ent)
-                # print(filtered_entities)
 
-        return (all_data, verification_matrix)
-
-
+    return all_data, verification_matrix
 
 
 def get_non_respecting_entities(file, verification_matrix):
     non_respecting = []
-    for k,v in verification_matrix.items():
+    for k, v in verification_matrix.items():
         entity = file.by_id(k)
         print(list(v.values()))
         if sum(v.values()) != 0:
             non_respecting.append(entity)
 
-    print(non_respecting)
     return non_respecting
 
 
@@ -358,11 +346,16 @@ def visualize(file, not_respecting_entities):
 
     entity_type = not_respecting_entities[0].is_a()
 
-    set_to_display = set(not_respecting_entities)|set(file.by_type(entity_type))
+    other_entities = [x for x in file.by_type("IfcBuildingElement") if x.is_a() != str(entity_type)]
+
+    set_of_entities = set(not_respecting_entities) | set(file.by_type(entity_type))
+    set_to_display = set_of_entities.union(set(other_entities))
 
     for el in set_to_display:
         if el in not_respecting_entities:
-            c = (1, 0.3, 0, 1)
+            c = (1, 0, 0, 1)
+        elif el in other_entities:
+            c = (1, 1, 1, 0)
         else:
             c = (0, 1, 0.5, 1)
 
