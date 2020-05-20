@@ -263,7 +263,7 @@ def get_data(mvd_concept, ifc_file, spreadsheet_export=True):
     # Check if IFC entities have been filtered at least once
     filtered = 0
 
-    entities = ifc_file.by_type(mvd_concept.name)
+    entities = ifc_file.by_type(mvd_concept.entity)
     selected_entities = entities
     verification_matrix = {}
     for entity in selected_entities:
