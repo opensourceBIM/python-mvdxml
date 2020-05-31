@@ -40,14 +40,32 @@ def extract_data(mvd_node, ifc_data):
     return_value = []
 
     if len(mvd_node.nodes) == 0:
-        return [{mvd_node: ifc_data}]
+        if mvd_node.tag == "AttributeRule":
+            try:
+                values_from_attribute = getattr(ifc_data, mvd_node.attribute)
+                return [{mvd_node: values_from_attribute}]
+            except:
+                return [{mvd_node: "Invalid Attribute"}]
+
+        else:
+            return [{mvd_node: ifc_data}]
 
     if mvd_node.tag == 'AttributeRule':
         data_from_attribute = []
+        try:
+            values_from_attribute = getattr(ifc_data, mvd_node.attribute)
+            if values_from_attribute is None:
+                return [{mvd_node:"Nonexistent value"}]
 
-        values_from_attribute = getattr(ifc_data, mvd_node.attribute)
+        except:
+            return [{mvd_node:"Invalid attribute rule"}]
+
+
         if isinstance(values_from_attribute, (list, tuple)):
+            if len(values_from_attribute) == 0:
+                return [{mvd_node: 'empty data structure'}]
             data_from_attribute.extend(values_from_attribute)
+
         else:
             data_from_attribute.append(values_from_attribute)
 
@@ -281,7 +299,15 @@ def get_data(mvd_concept, ifc_file, spreadsheet_export=True):
             filtering = False
 
         # Access all the Rules of the ConceptTemplate
-        rules_root = concept.template().rules[0]
+        if len(concept.template().rules) > 1:
+            attribute_rules = []
+            for rule in concept.template().rules:
+                attribute_rules.append(rule)
+            rules_root = ifcopenshell.mvd.rule("EntityRule", mvd_concept.entity, attribute_rules)
+        else:
+            rules_root = concept.template().rules[0]
+
+
         extracted_data = get_data_from_mvd(selected_entities, rules_root, filtering=filtering)
         all_data.append(extracted_data)
 
