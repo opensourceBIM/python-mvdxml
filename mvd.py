@@ -194,7 +194,7 @@ def correct_for_export(all_data):
     """
     for d in all_data:
         for k, v in d.items():
-            if isinstance(v, list):
+            if isinstance(v, list) or isinstance(v, tuple):
                 if len(v):
                     new_list = []
                     for data in v:
