@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvdXML name="mvdXML examples" uuid="4afb1a8b-0b61-4ff8-9863-c10690fe06f2" xmlns="http://buildingsmart-tech.org/mvdXML/mvdXML1-1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsmart-tech.org/mvdXML/mvdXML1-1 ../xsd/mvdXML_V1-1_draft.xsd">
+  <Templates>
+    <ConceptTemplate uuid="252a5fa6-cc5b-4d30-bd0c-35e22e336499" name="Connectivity" code="" status="" applicableSchema="IFC4" applicableEntity="IfcObject">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p class="std">
+        Objects may participate in various connectivity
+        relationships with other objects.
+      </p>
+]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="06674893-7a2c-493b-8eb5-e85a058707b3" name="Filling" status="" applicableSchema="IFC4" applicableEntity="IfcElement">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>Elements such as doors and windows may be placed inside openings of walls, slabs, or other elements.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule AttributeName="FillsVoids" Cardinality="_asSchema">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelFillsElement" Cardinality="_asSchema">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="RelatingOpeningElement" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcOpeningElement" Cardinality="_asSchema">
+                          <AttributeRules>
+                            <AttributeRule AttributeName="VoidsElements" Cardinality="_asSchema">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcRelVoidsElement" Cardinality="_asSchema">
+                                  <AttributeRules>
+                                    <AttributeRule RuleID="Type" AttributeName="RelatingElement" Cardinality="_asSchema">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcElement" Cardinality="_asSchema">
+                                        </EntityRule>
+                                      </EntityRules>
+                                    </AttributeRule>
+                                  </AttributeRules>
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="HasFillings" Cardinality="ZeroToOne">
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid="f935ce4c-b52e-4175-ac7f-cca0dc638871" name="CoordinationView" version="2014" applicableSchema="IFC4">
+      <ExchangeRequirements>
+        <ExchangeRequirement uuid="9a71e977-a156-426b-8599-c7cf6dc463c1" name="Examples" applicability="export">
+        </ExchangeRequirement>
+      </ExchangeRequirements>
+      <Roots>
+        <ConceptRoot uuid="d2b8f47b-36b7-48a2-b248-f9d7a921f6e1" name="Door" applicableRootEntity="IfcDoor">
+          <Concepts>
+            <Concept uuid="8329cb90-1062-401f-b965-8fa07202225a" name="Filling">
+              <Template ref="06674893-7a2c-493b-8eb5-e85a058707b3" />
+              <Requirements>
+                <Requirement applicability="export" requirement="optional" exchangeRequirement="9a71e977-a156-426b-8599-c7cf6dc463c1" />
+              </Requirements>
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+        <ConceptRoot uuid="f1013c14-f631-4a05-99f7-73f772025997" name="Window" applicableRootEntity="IfcWindow">
+          <Concepts>
+            <Concept uuid="7dca33ea-2faf-43b3-9f09-4bf8aa06d43d" name="Filling">
+              <Template ref="06674893-7a2c-493b-8eb5-e85a058707b3" />
+              <Requirements>
+                <Requirement applicability="export" requirement="optional" exchangeRequirement="9a71e977-a156-426b-8599-c7cf6dc463c1" />
+              </Requirements>
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>

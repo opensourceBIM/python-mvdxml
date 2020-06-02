@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvdXML name="mvdXML examples" uuid="4afb1a8b-0b61-4ff8-9863-c10690fe06f2" xmlns="http://buildingsmart-tech.org/mvdXML/mvdXML1-1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsmart-tech.org/mvdXML/mvdXML1-1 ../xsd/mvdXML_V1-1_draft.xsd">
+  <Templates>
+    <ConceptTemplate uuid="4b385464-b99a-42bc-a17a-a0a647a1ab5b" name="Association" code="" status="" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="ea2a63be-fd0d-426d-863b-52c3970ca585" name="Material" code="" status="" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p class="std">
+
+        Any product or product type can have associated materials indicating the physical composition of an object.
+
+        Materials can have representations for surface styles indicating colors, textures, and light reflectance for 3D
+
+        rendering. Materials can have representations for fill styles indicating colors, tiles, and hatch patterns for
+
+        2D rendering. Materials can have properties such as density, elasticity, thermal resistance, and others as
+
+        defined in this specification. Materials can also be classified according to a referenced industry standard.
+
+      </p>
+
+      <p class="std">
+
+        An object can be comprised of a single material or a set of materials with a particular layout. Several
+
+        examples include:
+
+      </p>
+
+      <ul class="std">
+
+        <li class="std">a slab may have an associated layer of concrete;
+
+        </li>
+
+        <li class="std">a beam may have an associated I-Shape profile of steel;
+
+        </li>
+
+        <li class="std">a door may have associated constituents for framing and glazing;
+
+        </li>
+
+        <li class="std">a port may have an associated profile and/or material flowing through it such as hot water.
+
+        </li>
+
+      </ul>
+]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="6d5fb86f-3f2d-49fb-9528-077855ddcc47" name="Material Layer Set Usage" code="" status="" applicableSchema="IFC4" applicableEntity="IfcProduct">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>Material layer set usage defines layout at occurrences to indicate a direction and offset from the 'Axis' reference curve, and a reference extent such as for a default wall height. </p>]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule AttributeName="HasAssociations" Cardinality="One">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcRelAssociatesMaterial" Cardinality="_asSchema">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="RelatingMaterial" Cardinality="_asSchema">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcMaterialLayerSetUsage" Cardinality="_asSchema">
+                              <AttributeRules>
+                                <AttributeRule AttributeName="ForLayerSet" Cardinality="_asSchema">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcMaterialLayerSet" Cardinality="_asSchema">
+                                      <AttributeRules>
+                                        <AttributeRule AttributeName="MaterialLayers" Cardinality="_asSchema">
+                                          <EntityRules>
+                                            <EntityRule EntityName="IfcMaterialLayer" Cardinality="_asSchema">
+                                              <AttributeRules>
+                                                <AttributeRule AttributeName="Name" Cardinality="_asSchema">
+                                                  <EntityRules>
+                                                    <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                                                    </EntityRule>
+                                                  </EntityRules>
+                                                </AttributeRule>
+                                                <AttributeRule AttributeName="Material" Cardinality="_asSchema">
+                                                  <EntityRules>
+                                                    <EntityRule EntityName="IfcMaterial" Cardinality="_asSchema">
+                                                      <AttributeRules>
+                                                        <AttributeRule AttributeName="Name" Cardinality="_asSchema">
+                                                          <EntityRules>
+                                                            <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                                                            </EntityRule>
+                                                          </EntityRules>
+                                                        </AttributeRule>
+                                                        <AttributeRule AttributeName="Description" Cardinality="_asSchema">
+                                                          <EntityRules>
+                                                            <EntityRule EntityName="IfcText" Cardinality="_asSchema">
+                                                            </EntityRule>
+                                                          </EntityRules>
+                                                        </AttributeRule>
+                                                        <AttributeRule AttributeName="Category" Cardinality="_asSchema">
+                                                          <EntityRules>
+                                                            <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                                                            </EntityRule>
+                                                          </EntityRules>
+                                                        </AttributeRule>
+                                                      </AttributeRules>
+                                                    </EntityRule>
+                                                  </EntityRules>
+                                                </AttributeRule>
+                                                <AttributeRule RuleID="" AttributeName="LayerThickness" Cardinality="_asSchema">
+                                                  <EntityRules>
+                                                    <EntityRule EntityName="IfcNonNegativeLengthMeasure" Cardinality="_asSchema">
+                                                    </EntityRule>
+                                                  </EntityRules>
+                                                </AttributeRule>
+                                              </AttributeRules>
+                                            </EntityRule>
+                                          </EntityRules>
+                                        </AttributeRule>
+                                        <AttributeRule AttributeName="LayerSetName" Cardinality="_asSchema">
+                                          <EntityRules>
+                                            <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                                            </EntityRule>
+                                          </EntityRules>
+                                        </AttributeRule>
+                                        <AttributeRule AttributeName="Description" Cardinality="_asSchema">
+                                          <EntityRules>
+                                            <EntityRule EntityName="IfcText" Cardinality="_asSchema">
+                                            </EntityRule>
+                                          </EntityRules>
+                                        </AttributeRule>
+                                      </AttributeRules>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule RuleID="DirectionSense" AttributeName="DirectionSense" Cardinality="_asSchema">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcDirectionSenseEnum" Cardinality="_asSchema">
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule RuleID="LayerSetDirection" AttributeName="LayerSetDirection" Cardinality="_asSchema">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcLayerSetDirectionEnum" Cardinality="_asSchema">
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid="f935ce4c-b52e-4175-ac7f-cca0dc638871" name="CoordinationView" version="2014" applicableSchema="IFC4">
+      <ExchangeRequirements>
+        <ExchangeRequirement uuid="9a71e977-a156-426b-8599-c7cf6dc463c1" name="Examples" applicability="export">
+        </ExchangeRequirement>
+      </ExchangeRequirements>
+      <Roots>
+        <ConceptRoot uuid="30188bbe-5eea-4cd6-a8ee-3414148d3a50" name= "Slab" applicableRootEntity="IfcSlab">
+          <Concepts>
+            <Concept uuid="59b515d0-d057-45c3-acbb-851dd9ba14a2" name="Material Layer Set Usage" Override="false">
+              <Template ref="6d5fb86f-3f2d-49fb-9528-077855ddcc47" />
+              <Requirements>
+                <Requirement applicability="export" requirement="mandatory" exchangeRequirement="9a71e977-a156-426b-8599-c7cf6dc463c1" />
+              </Requirements>
+              <Rules>
+                <TemplateRule Parameters="DirectionSense[Value]='POSITIVE' AND LayerSetDirection[Value]='AXIS3' " />
+              </Rules>
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>

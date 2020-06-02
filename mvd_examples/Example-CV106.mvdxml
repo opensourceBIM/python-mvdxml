@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mvdXML name="mvdXML examples" uuid="4afb1a8b-0b61-4ff8-9863-c10690fe06f2" xmlns="http://buildingsmart-tech.org/mvdXML/mvdXML1-1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://buildingsmart-tech.org/mvdXML/mvdXML1-1 ../xsd/mvdXML_V1-1_draft.xsd">
+  <Templates>
+    <ConceptTemplate uuid="805deb96-2684-4bc5-a9ad-3a29199dc023" name="Project" status="" applicableSchema="IFC4" applicableEntity="IfcContext">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>All files contain a single <i>IfcProject</i> instance indicating overall context and a directory of objects contained within.</p>]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="38dac6f0-997c-4544-9bca-b6326b9a3e4b" name="Project Context" status="" applicableSchema="IFC4" applicableEntity="IfcContext">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[ <p class="std">
+
+        A project representation context indicates the coordinate system orientation, direction of true north,
+
+        precision, and other values that apply to all geometry within a project or project library.
+
+      </p>
+]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule RuleID="RepresentationContext" AttributeName="RepresentationContexts" Cardinality="_asSchema">
+              <EntityRules>
+                <EntityRule EntityName="IfcGeometricRepresentationContext" Cardinality="_asSchema">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="ContextIdentifier" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule RuleID="ContextType" AttributeName="ContextType" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="CoordinateSpaceDimension" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcDimensionCount" Cardinality="_asSchema">
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="WorldCoordinateSystem" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcAxis2Placement3D" Cardinality="_asSchema">
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="TrueNorth" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcDirection" Cardinality="_asSchema">
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="HasSubContexts" Cardinality="_asSchema">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcGeometricRepresentationSubContext" Cardinality="_asSchema">
+                          <AttributeRules>
+                            <AttributeRule RuleID="SubContextIdentifier" AttributeName="ContextIdentifier" Cardinality="_asSchema">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="ContextType" Cardinality="_asSchema">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" Cardinality="_asSchema">
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid="f935ce4c-b52e-4175-ac7f-cca0dc638871" name="CoordinationView" version="2014" applicableSchema="IFC4">
+      <ExchangeRequirements>
+        <ExchangeRequirement uuid="9a71e977-a156-426b-8599-c7cf6dc463c1" name="Examples" applicability="export">
+        </ExchangeRequirement>
+      </ExchangeRequirements>
+      <Roots>
+        <ConceptRoot uuid="dc78525e-b86d-45e1-a3fc-aaf15d1624f9" name="Project" applicableRootEntity="IfcProject">
+          <Concepts>
+            <Concept uuid="2f343b21-7a22-4674-af0b-48144a075fc9" name="Project Context">
+              <Template ref="38dac6f0-997c-4544-9bca-b6326b9a3e4b" />
+              <Requirements>
+                <Requirement applicability="export" requirement="mandatory" exchangeRequirement="9a71e977-a156-426b-8599-c7cf6dc463c1" />
+              </Requirements>
+              <Rules>
+                <TemplateRule Parameters="RepresentationContext[Size]&lt;3 AND ContextType[Value]='Model' AND SubContextIdentifier[Value]='Body' " />
+              </Rules>
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>

@@ -1,0 +1,1619 @@
+<?xml version="1.0"?>
+<mvdXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" uuid="5f67ff96-447b-4f71-a8a1-10aec42b3fa3" name="" status="sample" xsi:schemaLocation="http://www.buildingsmart-tech.org/mvd/XML/1.1 http://www.buildingsmart-tech.org/mvd/XML/1.1/mvdXML_V1.1_add1.xsd" xmlns="http://buildingsmart-tech.org/mvd/XML/1.1">
+  <Templates>
+    <ConceptTemplate uuid="33e0be15-e301-4858-9f4b-18b2eb5488ba" name="Object Definition" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>The concept templates of <em>Object Definition</em> provides the means to define an object occurrence by its object type and attached property and quantity sets.</p>]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="35a2e10e-20df-40f4-ab2f-dacf0a6744f4" name="Object Typing" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>Object occurrences can be
+ defined by a particular object type, using the <em>Object Typing</em> concept. A pair of entities are defined for most semantic objects - an
+ object occurrence entity and a corresponding object type entity.</p> 
+
+
+<blockquote class="example">EXAMPLE&nbsp; The <em>IfcTank</em>
+ is the object occurrence entity that has a corresponding
+ <em>IfcTankType</em> being the object type entity.
+</blockquote>
+
+ 
+
+
+<p>On instance level, an
+ object occurrence instance may have:</p>
+
+<ul>
+ 
+<li>similar state as its object
+ type instance by applying all characteristics defined at the type;</li>
+<li>overridden state for particular characteristics;</li>
+
+ <li>no defined object type instance.</li>
+
+
+</ul>
+
+
+
+
+<p>Characteristics defined at the object type level may include:</p>
+
+<ul>
+ <li>common naming and predefined type;</li>
+ 
+<li>common properties within a type driven property set;</li>
+ 
+<li>common geometry representations, applied as mapped representation to each occurences;</li>
+ 
+<li>common material assignments (with exception of material set usages);</li>
+<
+ <li>common definition of a decomposition structure.</li>
+
+</ul>
+
+
+<p>
+Many object occurrence and object type entities have an
+ attribute named <i>PredefinedType</i> consisting of a specific
+ enumeration. Such predefined
+ type essentially provides another level of inheritance to
+ further differentiate objects without the need for
+ additional entities. Predefined types are not
+ just informational; various rules apply such as applicable
+ property
+ sets, part composition, and distribution ports. If the object is typed by an <i>IfcTypeObject</i>, then the <i>PredefinedType</i> at the <i>IfcObject</i> occurrence shall only be used if the <i>PredefinedType</i> at <i>IfcTypeObject</i> is set to <i>NOTDEFINED</i>.
+
+
+
+
+<blockquote class="example">
+EXAMPLE&nbsp; 
+For scenarios of object types having part compositions,
+such parts may be reflected at object occurrences having
+ separate state. For example, a <i>wall type</i> may define
+ a particular arrangement of studs, a <i>wall occurrence</i>
+ may reflect the same arrangement of studs, and studs within
+  the wall occurrence may participate in specific
+ relationships that do not exist at the type such as being
+ connected to an electrical junction box.</blockquote>
+
+ 
+
+<blockquote class="note">
+NOTE&nbsp; If the object type has aggregated elements, such objects are reflected at the object occurrence using the <em>IfcRelDefinesByObject</em> relationship.</blockquote>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule RuleID="HasType" AttributeName="IsTypedBy">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelDefinesByType">
+                  <AttributeRules>
+                    <AttributeRule RuleID="RelatingType" AttributeName="RelatingType">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcTypeObject" />
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="36984334-3ac8-4e59-85a6-f68d65e379c7" name="Property Sets" status="sample" applicableSchema="IFC4" applicableEntity="IfcRoot">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>The concept template <em>Property Sets</em> describes how sets of properties (usually defined by a name, value, unit triple) are associated to objects or object types.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="f74255a6-0c0e-4f31-84ad-24981db62461" name="Property Sets for Objects" version="1" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>The concept template <em>Property Sets for Objects</em> describes how an object occurrence can be related to a single or multiple property sets. A property set
+ contains a single or multiple properties. The data types of
+ an individual property are single value, enumerated value,
+ bounded value, table value, reference value, list value,
+ and combination of property occurrences.
+</p>
+  
+
+<p>Property sets can also be related to an object type, see concept <em>Property Sets for Types</em>. They then define the common properties for all occurrences of the same type. If the same property (by name) is provided by the same property set (by name), then the properties directly assigned to the object occurrence override the properties assigned to the object type.</p>
+]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule RuleID="PredefinedType" AttributeName="PredefinedType" />
+                <AttributeRule AttributeName="IsDefinedBy">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcRelDefinesByProperties">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="RelatingPropertyDefinition">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcPropertySet">
+                              <AttributeRules>
+                                <AttributeRule RuleID="PsetName" AttributeName="Name">
+                                    <EntityRules>
+                                      <EntityRule EntityName="IfcLabel" />
+                                    </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule RuleID="Properties" AttributeName="HasProperties">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcPropertySingleValue">
+                                      <References>
+                                        <Template ref="6655f6d0-29a8-47b8-8f3d-c9fce9c9a620" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyBoundedValue">
+                                      <References>
+                                        <Template ref="3d67a2d2-761d-44d9-a09e-b7fbb1fa5632" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyEnumeratedValue">
+                                      <References>
+                                        <Template ref="c148a099-c351-43a8-9266-5f3de0b45a95" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyListValue">
+                                      <References>
+                                        <Template ref="8e10b688-9179-4e3a-8db2-6abcaafe952d" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyTableValue">
+                                      <References>
+                                        <Template ref="35c947b0-6abc-4b13-8ec7-696ef2041721" />
+                                      </References>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="6652398e-6579-4460-8cb4-26295acfacc7" name="Quantity Sets" version="1" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[
+<p>
+Any specialization of object can be related to multiple quantity set occurrences. A quantity set
+ contains multiple quantity occurrences. The data type of
+ quantity occurrence values are count, length, area, volume, weight, time, or a combination of quantities. Each quantity is defined by its name, value, and optionally a description and a formula.</p>
+
+
+<p>The quantity set is expressed by instances of <em>IfcElementQuantity</em>, where the <em>Name</em> attribute determines the common designator of the quantity set. This specification contains a number of predefined quantity sets, a template definition is provided for each of them. The name of the template has to be used as the value of the <em>Name</em> attribute. The <em>MethodOfMeasurement</em> attribute specifies the method, by which the values of the individual quantities are calculated. For the quantity set templates included in this specification, the value of <em>MethodOfMeasurement</em> shall be "BaseQuantities".</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule AttributeName="IsDefinedBy">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelDefinesByProperties">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="RelatingPropertyDefinition">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcElementQuantity">
+                          <AttributeRules>
+                            <AttributeRule RuleID="QsetName" AttributeName="Name">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Description">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcText" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="MethodOfMeasurement">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Quantities" AttributeName="Quantities">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcQuantityLength">
+                                  <References>
+                                    <Template ref="dd8678e1-e300-4f70-9d63-e539db4bd11c" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityArea">
+                                  <References>
+                                    <Template ref="65ac4747-6eff-437e-94e2-643fd4e3bf86" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityVolume">
+                                  <References>
+                                    <Template ref="6491a3b0-b7e9-412a-8226-bcd91c2b0b0e" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityWeight">
+                                  <References>
+                                    <Template ref="e1016e56-3c89-4f42-9679-07e1db3c0afb" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityCount">
+                                  <References>
+                                    <Template ref="8aaeff32-572c-4f6a-ac64-e2151663cbf1" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityTime">
+                                  <References>
+                                    <Template ref="43c4c050-04de-4b0f-9e43-708bd98201a8" />
+                                  </References>
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="ccb45aa2-74e1-46e8-8e35-ca5e5d7cc9dd" name="Object Attributes" status="sample" applicableSchema="IFC4" applicableEntity="IfcRoot">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>
+
+All entities having semantic significance derive from <i>IfcRoot</i>, where instances are identifiable within a data set using a
+
+ compressed globally unique identifier (IFC-GUID). This identifier must never change during the lifetime of an
+
+ object, which allows data to be merged, versioned, or referenced from other locations.
+
+</p>
+
+
+<p>
+
+Resource-level instances (not deriving from <i>IfcRoot</i>) do not have any identity, such that two instances
+
+ having identical state are considered equal. For example, if an object has coordinates described by an
+
+ <i>IfcCartesianPoint</i> instance, another object with the same coordinates may have a separate instance of
+
+ <i>IfcCartesianPoint</i> or share the same instance; such difference is a matter of data storage optimization
+
+ and does not imply any semantic relationship. This also implies that non-rooted instances may only exist if
+
+ referenced by at least one rooted instance through either a direct attribute or inverse attribute, or following
+
+ a chain of attribute references on instances.
+
+</p>
+
+
+<p>
+
+The distinction between rooted and non-rooted (resource-level) entities achieves several goals:
+
+</p>
+
+
+<ul class="ref">
+
+
+ <li>File size may be reduced by interning (sharing) non-rooted data instances;
+
+</li>
+
+
+ <li>Database retrieval may be more efficient by storing non-rooted data local to rooted data
+
+ instances;
+
+</li>
+
+
+ <li>Storage size may be reduced by avoiding IFC-GUID storage for items not requiring direct
+
+ retrieval;
+
+</li>
+
+
+ <li>Comparisons of differences may be done at a higher level where the context of such change is
+
+ apparent;
+
+</li>
+
+
+ <li>Implementations may treat non-rooted data instances as immutable for efficiency or simplified
+
+ usage.
+
+</li>
+
+
+</ul>
+
+]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="c19ec186-9cfd-47fc-a4d4-9fb35008d04a" name="Object User Identity" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>An object may be labeled for human identification where the <i>Name</i> may indicate a well-known identifier. While there is no restriction on usage of such identifier, it is recommended the <i>Name</i> is unique within it's containing scope. Further guidance on usage is provided at specific entities; for example, for spaces, the <i>Name</i> may reflect a room number. An object may have a description provided via the <i>Description</i> attribute that provides further context in identifying or locating the object.</p>
+
+<p>Specific subtypes introduce additional attributes for <em>User Identity</em>.</p>
+<ul>
+ <li>Spatial objects may be further identified via the <i>LongName</i> attribute. This value should generally correspond to building signage describing floor levels or rooms. While the <i>Name</i> attribute generally provides a coded or abbreviated identifier, the <i>LongName</i> provides a functional name for the location such as "Reception Area". See concept template <em>Spatial Element Occurrence Attributes</em></li>
+ <li>Physical elements may be further identified via the <i>Tag</i> attribute. This is a human readable identifier such as an element or item number While there is no restriction on usage of such tags, it is recommended the <i>Tag</i> is unique within it's containing scope. See concept template <em>Element Occurrence Attributes</em></li>
+</ul>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule RuleID="ObjectName" AttributeName="Name">
+              <EntityRules>
+                <EntityRule EntityName="IfcLabel" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule RuleID="ObjectDescription" AttributeName="Description">
+              <EntityRules>
+                <EntityRule EntityName="IfcText" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule AttributeName="IsTypedBy">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelDefinesByType">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="RelatingType">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcTypeObject">
+                          <AttributeRules>
+                            <AttributeRule RuleID="TypeName" AttributeName="Name">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="TypeDescription" AttributeName="Description">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcText" />
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="25248261-98df-4d0a-9364-5653575ca421" name="Object Predefined Type" status="proposal" applicableSchema="IFC4" applicableEntity="IfcObject">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>
+Many object occurrences have an
+ attribute named <i>PredefinedType</i> being a specific
+ enumeration. Such predefined
+ type essentially provides another level of "classification by inheritance" to
+ further differentiate objects without the need for
+ additional sub types. Predefined types are not
+ just informational; various rules apply such as applicable
+ property
+ sets, part composition, and distribution ports.Such predefined types are added by selecting the correct enumerator for the attribute <em>PredefinedType</em>. If a custom value is needed, the attribute <i>ObjectType</i> has to be used to define such custom type, whereas the <i>PredefinedType</i> is set to <i>USERDEFINED</i>.</p>
+
+<p>The main attributes to be provided for a <em>Object Occurrence Predefined Type</em> are:</p>
+<ul>
+
+ 
+<li><em>PredefinedType</em>: holds the entity specific enumeration of predefined types to further classify the entity</li>
+
+ 
+<li><em>ObjectType</em>: allows for a custom value, if no applicable enumerator can be found</li>
+
+</ul>
+
+ If the object is typed by an <i>IfcTypeObject</i>, then the <i>PredefinedType</i> at the <i>IfcObject</i> occurrence shall only be used if the <i>PredefinedType</i> at <i>IfcTypeObject</i> is set to <i>NOTDEFINED</i>.
+
+]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule AttributeName="ObjectType">
+              <EntityRules>
+                <EntityRule EntityName="IfcLabel" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule AttributeName="IsTypedBy">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelDefinesByType">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="RelatingType">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcTypeObject" />
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="73e34d23-ed0d-4afd-a87d-4da2df34466a" name="Object Occurrence Attributes" status="sample" applicableSchema="IFC4" applicableEntity="IfcRoot">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>Specific entities have additional attributes defined for describing common characteristics at occurrences.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="9661dfc6-707f-49a8-8881-7142b07f3bb1" name="Spatial Element Attributes" status="sample" applicableSchema="IFC4" applicableEntity="IfcSpatialElement">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>Spatial objects may be further identified via the <i>LongName</i> attribute. This value should generally correspond to building signage describing floor levels or rooms. While the <i>Name</i> attribute generally provides a coded or abbreviated identifier, the <i>LongName</i> provides a functional name for the location such as "Reception Area". </p>]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule RuleID="Name" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="LongName" AttributeName="LongName">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+              <SubTemplates>
+                <ConceptTemplate uuid="40100f0d-dd58-47f3-899a-b6a5a6b4f572" name="Building Attributes" status="sample" applicableSchema="IFC4" applicableEntity="IfcBuilding">
+                  <Definitions>
+                    <Definition>
+                      <Body><![CDATA[<p>A building may be located according to a postal address, and may indicate a baseline elevation and land elevation.</p>]]></Body>
+                    </Definition>
+                  </Definitions>
+                  <Rules>
+                    <AttributeRule RuleID="LongName" AttributeName="LongName">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcLabel" />
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule RuleID="Name" AttributeName="Name">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcLabel" />
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="CompositionType">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcElementCompositionEnum" />
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="ElevationOfRefHeight">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcLengthMeasure" />
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule AttributeName="ElevationOfTerrain">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcLengthMeasure" />
+                      </EntityRules>
+                    </AttributeRule>
+                    <AttributeRule RuleID="HasAddress" AttributeName="BuildingAddress">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcPostalAddress">
+                          <AttributeRules>
+                            <AttributeRule AttributeName="Purpose">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcAddressTypeEnum" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Description">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcText" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="UserDefinedPurpose">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="InternalLocation">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="AddressLines" AttributeName="AddressLines">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="PostalBox">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Town" AttributeName="Town">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Region">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="PostalCode" AttributeName="PostalCode">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Country" AttributeName="Country">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </Rules>
+                </ConceptTemplate>
+              </SubTemplates>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="4b385464-b99a-42bc-a17a-a0a647a1ab5b" name="Object Association" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>The concept of an <em>Object Association</em> provides the means to associate sources of information (most notably a 
+classification, library, document, approval, contraint, or material) to objects definitions. The information associated may reside internally or externally in regard of the project data.
+</p>]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="4a224609-6578-4c75-afcf-8affa86e5ef2" name="Classification Association" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>The concept <em>Classification Association</em> describes how objects and object types can be further described by associating references to external sources of information. 
+The source of information can be:
+</p>
+ 
+
+<ul>
+
+ 
+<li>a classification system;</li>
+
+ 
+<li>a dictionary server;</li>
+
+ 
+<li>any external catalogue that classifies the object further;</li>
+
+ 
+<li>any service that combine the above features.</li>
+
+</ul>
+
+
+
+
+<p>An individual item within the external source of information can be selected. 
+It then applies the inherent meaning of the item to the <em>IfcObject</em> or <em>IfcTypeObject</em>.</p>
+<blockquote class="note">
+NOTE&nbsp; The classification system or dictionary server that is used within the project itself can also be indicated at the level of <em>IfcProject</em> or <em>IfcProjectLibrary</em> either as an external source, or copied with all relevant classification items into the project data. Use the concept <em>Project Classification Information</em> to utilize this functionality.
+</blockquote>
+<p>The main attributes to be provided for a <em>Classification Association</em> are:</p>
+<ul>
+
+ 
+<li><em>Identification</em>: holds the key provided for a specific references to classification items (or tables)</li>
+
+ 
+<li><em>Name</em>: allows for a human interpretable designation of a classification notation</li>
+
+</ul>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule AttributeName="HasAssociations">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelAssociatesClassification">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="RelatingClassification">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcClassificationReference">
+                          <AttributeRules>
+                            <AttributeRule RuleID="Identification" AttributeName="Identification">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcIdentifier" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Name" AttributeName="Name">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Description">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcText" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="ReferencedSource">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcClassification">
+                                  <AttributeRules>
+                                    <AttributeRule RuleID="ClassificationSource" AttributeName="Source">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcLabel" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                    <AttributeRule RuleID="ClassificationName" AttributeName="Name">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcLabel" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                    <AttributeRule RuleID="ClassificationTokens" AttributeName="ReferenceTokens">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcIdentifier" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                    <AttributeRule AttributeName="Edition">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcLabel" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                    <AttributeRule AttributeName="Description">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcText" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                    <AttributeRule AttributeName="Location">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcURIReference" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                    <AttributeRule AttributeName="EditionDate">
+                                      <EntityRules>
+                                        <EntityRule EntityName="IfcDate" />
+                                      </EntityRules>
+                                    </AttributeRule>
+                                  </AttributeRules>
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Sort">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcIdentifier" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Location">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcURIReference" />
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="5098cd13-bf4b-473a-a846-a60f69e9b738" name="Object Composition" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[
+<p>Objects may be composed into parts to indicate levels of
+ detail, such as a building having multiple storeys, a
+ framed wall having studs, or a task having subtasks.
+ Composition may form a hierarchy of multiple levels, where
+ an object must have a single parent, or if a top-level
+ object then declared within the single project or a project library.</p>          
+        
+      ]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="02eefcc6-b26c-4f20-9c7c-c30ae74eb9a9" name="Aggregation" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>An aggregation indicates an internal unordered part composition relationship between the whole structure, referred to as the "composite", and the subordinate components, referred to as the "parts". The concept of aggregation is used in various ways. Examples are:</p>
+
+
+
+<ul>
+
+
+<li>Aggregation is used on building elements to indicate parts such as studs within a wall;</li>
+
+
+
+
+<li>Aggregation is used on spatial elements to indicate a spatial structure such as a story within a building;</li>
+
+
+
+
+<li>Aggregation is used on systems to indicate subsystems such as branch circuits.</li>
+
+</ul>
+
+
+<p>Aggregation is a bi-directional relationship, the relationship from the composite to its parts is called Decomposition, and the relationship from the part to its composite is called Composition.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="8c0fd2f7-71bb-4e6e-8fdb-0c02b352f14a" name="Spatial Composition" status="sample" applicableSchema="IFC4" applicableEntity="IfcSpatialElement">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>Provision of a spatial structure of the project by aggregating spatial elements. The spatial structure is a hierarchical tree of spatial elements ultimately assigned to the project. Composition refers to the relationship to a higher level element (e.g. this storey is part of a building).</p>
+
+<blockquote class="note">NOTE&nbsp; The link between the highest level spatial element and the project is provided by this concept through <em>IfcRelContainedInSpatialStructure</em> and not through declaration using <em>IfcRelDeclares</em>. This is a known anomaly intruduced to maintain compatibility with earlier versions of this standard.</blockquote>
+
+<p>The order of spatial structure elements being included in the concept for builing projects are from high to low level: <em>IfcProject</em>, <em>IfcSite</em>, <em>IfcBuilding</em>, <em>IfcBuildingStorey</em>, and <em>IfcSpace</em> with <em>IfcSite</em>, <em>IfcBuildingStorey</em> and <em>IfcSpace</em> being optional levels. Therefore an spatial structure element can only be part of an element at the same or higher level.</p>
+
+<p>In addition a more general hierarchical tree of spatial elements can be created by using <em>IfcSpatialZone</em>, from high to low: <em>IfcProject</em>, <em>IfcSite</em>, and <em>IfcSpatialZone</em> with <em>IfcSite</em> being an optional level.</em></p>
+
+<blockquote class="note">NOTE&nbsp; The more general hiearchical tree has been introduced as an intermediate solution and stub for further extensions to support infrastructure works.</blockquote>]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule AttributeName="Decomposes">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcRelAggregates">
+                      <AttributeRules>
+                        <AttributeRule RuleID="RelatingObject" AttributeName="RelatingObject">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcProject">
+                              <AttributeRules>
+                                <AttributeRule RuleID="ProjectName" AttributeName="Name">
+                                  <EntityRule EntityName="IfcLabel"></EntityRule>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                            <EntityRule EntityName="IfcSpatialElement">
+                              <AttributeRules>
+                                <AttributeRule RuleID="SpatialElementName" AttributeName="Name">
+                                   <EntityRule EntityName="IfcLabel">
+                                  </EntityRule>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="667f8443-ecce-4a8d-a63f-931fab0453e0" name="Spatial Decomposition" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>Provision of a spatial structure of the project by aggregating spatial elements. The spatial structure is a hierarchical tree of spatial elements ultimately assigned to the project. Decomposition refers to the relationship to a lower level element (e.g. this storey has spaces).</p>
+
+<blockquote class="note">NOTE&nbsp; The link between the project and the highest level spatial element is provided by this concept through <em>IfcRelContainedInSpatialStructure</em> and not through declaration using <em>IfcRelDeclares</em>. This is a known anomaly intruduced to maintain compatibility with earlier versions of this standard.</blockquote>
+
+<p>The order of spatial structure elements being included in the concept for builing projects are from low to high level: <em>IfcSpace</em>, <em>IfcBuildingStorey</em>, <em>IfcBuilding</em>, <em>IfcSite</em> and <em>IfcProject</em> with <em>IfcSite</em>, <em>IfcBuildingStorey</em> and <em>IfcSpace</em> being optional levels. Therefore an spatial structure element can only be part of an element at the same or higher level.</p>
+
+<p>In addition a more general hierarchical tree of spatial elements can be created by using <em>IfcSpatialZone</em>, from low to high: <em>IfcSpatialZone</em>, <em>IfcSite</em>, and <em>IfcProject</em>, with <em>IfcSite</em> being an optional level.</em></p>
+
+<blockquote class="note">NOTE&nbsp; The more general hiearchical tree has been introduced as an intermediate solution and stub for further extensions to support infrastructure works.</blockquote>]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule AttributeName="IsDecomposedBy">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcRelAggregates">
+                      <AttributeRules>
+                        <AttributeRule RuleID="RelatedObjects" AttributeName="RelatedObjects">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcSpatialElement">
+                              <AttributeRules>
+                                <AttributeRule RuleID="SpatialElementName" AttributeName="Name">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcLabel" />
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="252a5fa6-cc5b-4d30-bd0c-35e22e336499" name="Object Connectivity" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p class="std">
+        Objects may participate in various connectivity
+        relationships with other objects.
+      </p>
+]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="81bc486c-1976-4e11-a469-cff2f70f123e" name="Spatial Structure" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>Spatial structures, such as site, building, storey, or spaces, may contain physical elements, including building elements, distribution elements, and furnishing elements. The containment relationship between the physical elements and the spatial structures is hierarchical, i.e. a physical element shall only be contained within a single spatial structure.</p>
+
+<blockquote class="example">EXAMPLE&nbsp; An <em>IfcBeam</em> is placed within the spatial hierarchy using the objectified relationship <em>IfcRelContainedInSpatialStructure</em>, refering to it by its inverse attribute <em>SELF\IfcElement.ContainedInStructure</em>. Subtypes of <em>IfcSpatialStructureElement</em> are valid spatial containers, with <em>IfcBuildingStorey</em> being the default container. </blockquote>
+
+<p>The spatial containment relationship, together with the Spatial decomposition relationship, being hierarchical as well, establishes the hiearchical project tree structure in a building information model.</p> 
+
+<blockquote class="example">EXAMPLE&nbsp; The <em>IfcBuildingStorey</em> that logically contains the <em>IfcBeam</em> decomposes the <em>IfcBuilding</em> using the <em>IfcRelAggregates</em> relationship. Therefore the <em>IfcBeam</em> is also indirectly contained in the building. </blockquote>]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="61dd08ed-fd01-4955-9337-8afd284a0e6f" name="Spatial Container" status="sample" applicableSchema="IFC4" applicableEntity="IfcSpatialElement">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>The <em>Spatial Container</em> concept defines a spatial element as being the spatial container for physical elements, or other elements being directly related to the spatial container, such as annotations or grids. </p>
+<blockquote class="example">EXAMPLE&nbsp; A building story is a logical spatial container of building elements, distribution elements, or furnishing elements.</blockquote>
+<p>The <em>Spatial Container</em> concept is realized by using the <em>IfcRelContainedInSpatialStructure</em> objectified relationship between subtypes of <em>IfcSpatialElement</em> and the elements contained. The inverse relationship <em>ContainsElements</em> at the subtypes of <em>IfcSpatialElement</em> refers to the contained physical elements.</p>]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule AttributeName="ContainsElements">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcRelContainedInSpatialStructure">
+                      <AttributeRules>
+                        <AttributeRule RuleID="Type" AttributeName="RelatedElements">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcProduct" />
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="0e8b1397-1ac6-41e1-a6d0-f2b34688cb61" name="Product Shape" status="sample" applicableSchema="IFC4" applicableEntity="IfcProduct">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>A product is an occurence of a physical or virtual object with finite spatial extent that may have a shape representation as one of its characteristics. The concepts within the group of <em>Product Shape</em> define how a shape is created to represent different geometric and topological representations.</p>
+            ]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="ad2770c2-914e-4ab2-9d39-bc0dff3f7b24" name="Product Placement" status="sample" applicableSchema="IFC4" applicableEntity="IfcProduct">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>
+Product occurrences are placed in a right handed Cartesian coordinate system. The <em>Product Placement</em> is used to establish an object coordinate system that maby be placed relative to a parent object coordinate system, and ultimately to the project coordinate system.</p> ]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="cbe85b5f-7912-4a43-8bb7-1e63bf40b26d" name="Product Local Placement" status="sample" applicableSchema="IFC4" applicableEntity="IfcProduct">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>
+Product occurrences can be placed in 3D space relative to
+ where they are contained. Placement is defined by a
+ relative position (X, Y, Z coordinates), a horizontal
+ reference direction, and a vertical axis direction. At the
+ outermost level, relative directions are defined according
+ to representation context; for example, +X may point east,
+ +Y may point north, and +Z may point up.</p>
+
+
+<p>
+Placement follows aggregation and containment relationships
+ as follows:
+</p>
+
+
+<ul>
+
+ <li>at the outermost level, a site is globally
+ positioned according to latitude, longitude, and elevation;</li>
+
+
+ <li>for spatial structures, positioning is
+ relative to aggregation. For example, a site may aggregate
+ multiple buildings, each building may aggregate multiple
+ building storeys, and each building storey may aggregate
+ multiple spaces;</li>
+
+
+ <li>for building elements, positioning is
+ relative to the containing spatial structure. For example,
+ a building storey may contain slabs, walls, columns, and
+ beams;
+</li>
+
+ <li>for aggregated parts, positioning is
+ relative to aggregation. For example, a staircase may
+ aggregate one or more stair flights;</li>
+ <li>for feature elements, positioning is
+ relative to the affected building element. For example, an
+ opening element is positioned relative to the wall it
+ voids, which in turn is positioned relative to a building
+ storey;</li>
+
+ <li >for fillings, positioning is relative to
+ the filled opening. For example, a door is positioned
+ relative to an opening which in turn is positioned relative
+ to a wall;
+</li>
+
+
+ <li>for distribution ports, positioning is
+ relative to the containing distribution element. For
+ example, an air terminal may have a port connection for a
+ duct segment or fitting;</li>
+
+
+ <li>for distribution elements, positioning is
+ relative to the containing spatial structure, however may be constrained by port connections. For example, a
+ electrical junction box may fill an opening within a wall,
+ and the junction box may contain ports for contained
+ outlets or switches; the placement of such connected
+ elements is contrained relative to connected port of the
+  junction box. As another example, an air terminal may fill
+ a ceiling covering which is placed relative to a space; the
+ placement of a connecting duct fitting may be constrained
+ relative to the air terminal.
+</li>
+
+
+</ul>
+
+
+<p>If a containing spatial structure contains a grid, then
+ placement may also be based relative to grid coordinates.
+ In certain use cases, an absolute placement may be used by omiting the <em>IfcObjectPlacement</em>. In this case, the shape representation is defined within the world coordinate system.
+</p>
+]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule RuleID="HasPlacement" AttributeName="ObjectPlacement">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLocalPlacement">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="RelativePlacement">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcAxis2Placement3D" />
+                          </EntityRules>
+                        </AttributeRule>
+                        <AttributeRule RuleID="RelativeTo" AttributeName="PlacementRelTo">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcLocalPlacement" />
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="13f96914-1ad4-41d4-ba99-411a9ecbf567" name="Product Geometric Representation" status="sample" applicableSchema="IFC4" applicableEntity="IfcProduct">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[
+<p>
+
+The shape of products may be represented in multiple ways
+ for different purposes. Each representation has a
+ well-known string identifier and a particular
+ representation context. There may be multiple
+ representation contexts to describe a shape at various levels of detail. Most building elements have a 'Body'
+ representation which defines or approximates the physical shape and volume. In addition to physical building elements, non-physical elements may have representations
+ such as spaces and openings.
+
+</p>
+
+]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule AttributeName="Representation">
+              <EntityRules>
+                <EntityRule EntityName="IfcProductDefinitionShape">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="Name" />
+                    <AttributeRule AttributeName="Description" />
+                    <AttributeRule AttributeName="Representations">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcShapeRepresentation">
+                          <AttributeRules>
+                            <AttributeRule AttributeName="ContextOfItems">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcGeometricRepresentationContext" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Identifier" AttributeName="RepresentationIdentifier">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel">
+                                  <Constraints>
+                                    <Constraint Expression="Identifier[Value] = 'Body'" />
+                                  </Constraints>
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Type" AttributeName="RepresentationType">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+          <SubTemplates>
+            <ConceptTemplate uuid="b942ceb1-b818-4683-871b-9c979fa34dd5" name="Box Geometry" status="sample" applicableSchema="IFC4" applicableEntity="IfcProduct">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>
+Elements may have a simplified 'Box' representation
+ describing the dimensions of the smallest box bounding the
+ object. Such representation may be used for more efficient
+ spatial indexing or hit-testing.
+
+</p>
+
+
+<p>The representation identifier and type and the only allowed single representation item of the 'Box' representation
+ are:</p>
+
+<ul>
+ 
+<li><em>IfcShapeRepresentation</em><em>.RepresentationIdentifier</em> =
+'Box'</li>
+
+ 
+<li><em>IfcShapeRepresentation</em><em>.RepresentationType</em> : 'BoundingBox'</li>
+ 
+<li><em>IfcShapeRepresentation</em><em>.Items</em> =
+ <em>IfcBoundingBox</em></li>
+
+</ul>
+
+<blockquote class="note">NOTE&nbsp; The specification does not determine the method by which the bounding box has to be created. If such a method need to be prescribed the definition has to be established by model view definitions or implementer agreements.</blockquote>]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule AttributeName="Representation">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcProductDefinitionShape">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="Representations">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcShapeRepresentation">
+                              <AttributeRules>
+                                <AttributeRule AttributeName="ContextOfItems">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcGeometricRepresentationContext" />
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule RuleID="Identifier" AttributeName="RepresentationIdentifier">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcLabel">
+                                      <Constraints>
+                                        <Constraint Expression="Identifier[Value] = 'Box'" />
+                                      </Constraints>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule RuleID="Type" AttributeName="RepresentationType">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcLabel">
+                                      <Constraints>
+                                        <Constraint Expression="Type[Value] = 'BoundingBox'" />
+                                      </Constraints>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                                <AttributeRule AttributeName="Items">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcBoundingBox" />
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                        <AttributeRule AttributeName="Name" />
+                        <AttributeRule AttributeName="Description" />
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="a322fdd7-cd28-4ea7-8797-f6cf124ab3d6" name="Partial Templates" status="proposal" applicableSchema="IFC4" applicableEntity="IfcAddress">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>Partial concept templates are described herein to indicate usage of common data types, which are then incorporated into other templates.</p>]]></Body>
+        </Definition>
+      </Definitions>
+      <Rules>
+        <AttributeRule AttributeName="Purpose">
+          <EntityRules>
+            <EntityRule EntityName="IfcAddressTypeEnum">
+              <Constraints>
+                <Constraint Expression="[Value] = 'SITE'" />
+              </Constraints>
+            </EntityRule>
+          </EntityRules>
+        </AttributeRule>
+      </Rules>
+      <SubTemplates>
+        <ConceptTemplate uuid="88b4aaa9-0925-447c-b009-fe357b7c754e" name="Values" status="sample" applicableSchema="IFC4" applicableEntity="IfcSimpleProperty">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>Properties may contain user-defined data, where data types are open-ended.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule RuleID="PropertyName" AttributeName="Name">
+              <EntityRules>
+                <EntityRule EntityName="IfcIdentifier" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule AttributeName="Description">
+              <EntityRules>
+                <EntityRule EntityName="IfcText" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule AttributeName="Purpose">
+              <EntityRules>
+                <EntityRule EntityName="IfcAddressTypeEnum" />
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+          <SubTemplates>
+            <ConceptTemplate uuid="6655f6d0-29a8-47b8-8f3d-c9fce9c9a620" name="Single Value" status="sample" owner="System" applicableSchema="IFC4" applicableEntity="IfcPropertySingleValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="NominalValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="3d67a2d2-761d-44d9-a09e-b7fbb1fa5632" name="Bounded Value" status="sample" owner="System" applicableSchema="IFC4" applicableEntity="IfcPropertyBoundedValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="UpperValue" AttributeName="UpperBoundValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="LowerValue" AttributeName="LowerBoundValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="SetValue" AttributeName="SetPointValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="c148a099-c351-43a8-9266-5f3de0b45a95" name="Enumerated Value" status="sample" owner="System" applicableSchema="IFC4" applicableEntity="IfcPropertyEnumeratedValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="EnumerationValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="EnumerationReference">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcPropertyEnumeration">
+                      <AttributeRules>
+                        <AttributeRule RuleID="Reference" AttributeName="Name">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcLabel" />
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="8e10b688-9179-4e3a-8db2-6abcaafe952d" name="List Value" status="sample" applicableSchema="IFC4" applicableEntity="IfcPropertyListValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="ListValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="35c947b0-6abc-4b13-8ec7-696ef2041721" name="Table Value" status="sample" applicableSchema="IFC4" applicableEntity="IfcPropertyTableValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="DefiningValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Reference" AttributeName="DefinedValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Expression">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="CurveInterpolation">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcCurveInterpolationEnum" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="6c03e465-c5dd-42ce-9412-bebacabd2f3b" name="Quantities" status="sample" applicableSchema="IFC4" applicableEntity="IfcPhysicalSimpleQuantity">
+          <Rules>
+            <AttributeRule RuleID="QuantityName" AttributeName="Name">
+              <EntityRules>
+                <EntityRule EntityName="IfcLabel" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule AttributeName="Purpose">
+              <EntityRules>
+                <EntityRule EntityName="IfcAddressTypeEnum" />
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+          <SubTemplates>
+            <ConceptTemplate uuid="dd8678e1-e300-4f70-9d63-e539db4bd11c" name="Length Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityLength">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="LengthValue" AttributeName="LengthValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLengthMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="65ac4747-6eff-437e-94e2-643fd4e3bf86" name="Area Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityArea">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="AreaValue" AttributeName="AreaValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAreaMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="6491a3b0-b7e9-412a-8226-bcd91c2b0b0e" name="Volume Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityVolume">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="VolumeValue" AttributeName="VolumeValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcVolumeMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="e1016e56-3c89-4f42-9679-07e1db3c0afb" name="Weight Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityWeight">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="WeightValue" AttributeName="WeightValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcMassMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="8aaeff32-572c-4f6a-ac64-e2151663cbf1" name="Count Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityCount">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="CountValue" AttributeName="CountValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcCountMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="43c4c050-04de-4b0f-9e43-708bd98201a8" name="Time Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityTime">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="TimeValue" AttributeName="TimeValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcTimeMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Purpose">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAddressTypeEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="00000000-0000-0000-0000-000000000000" name="_Crane Planning View 0.2" code="4697a5c3-969a-47c0-9376-ecb3e9cfbc5d" status="sample" applicableSchema="IFC4">
+      <SubTemplates>
+        <ConceptTemplate uuid="f5811b63-80f8-4e8b-b533-7813f945f78c" status="sample" applicableSchema="IFC4" applicableEntity="IfcBuilding" />
+      </SubTemplates>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid="4697a5c3-969a-47c0-9376-ecb3e9cfbc5d" name="Crane Planning View 0.2" status="proposal" applicableSchema="IFC4">
+      <ExchangeRequirements>
+        <ExchangeRequirement uuid="41111646-96f0-491c-b9ee-5c9e06c25410" name="importCranePlanningScene" status="proposal" applicability="import" />
+        <ExchangeRequirement uuid="603b185a-c775-4bdf-b11c-060ed56de2d1" name="exportCranePlanningScene" status="sample" applicability="both" />
+      </ExchangeRequirements>
+      <Roots>
+        <ConceptRoot uuid="b99e032a-f7d0-4672-9e1e-e4344921f935" name="IfcBuilding" status="sample" applicableRootEntity="IfcBuilding">
+          <Applicability uuid="00000000-0000-0000-0000-000000000000" status="sample">
+            <Template ref="f5811b63-80f8-4e8b-b533-7813f945f78c" />
+            <TemplateRules operator="and" />
+          </Applicability>
+          <Concepts>
+            <Concept uuid="faadef95-10fc-4462-9f84-16a0035418bd" name="Spatial Decomposition" status="sample" override="false">
+              <Template ref="667f8443-ecce-4a8d-a63f-931fab0453e0" />
+            </Concept>
+            <Concept uuid="d4140da3-8062-4fe5-a5d9-2b50df823303" name="Spatial Composition" status="sample" override="false">
+              <Template ref="8c0fd2f7-71bb-4e6e-8fdb-0c02b352f14a" />
+            </Concept>
+            <Concept uuid="2da55e3f-4b1c-4849-b408-1a90078d05c6" name="Classification Association" status="sample" override="false">
+              <Template ref="4a224609-6578-4c75-afcf-8affa86e5ef2" />
+            </Concept>
+            <Concept uuid="37e5b2f4-7236-4131-b1b9-6665d8823871" name="Object Typing" status="sample" override="false">
+              <Template ref="35a2e10e-20df-40f4-ab2f-dacf0a6744f4" />
+            </Concept>
+            <Concept uuid="2436615a-d51d-4447-8c7a-b37dc51d428e" name="Property Sets for Objects" status="sample" override="false">
+              <Template ref="f74255a6-0c0e-4f31-84ad-24981db62461" />
+            </Concept>
+            <Concept uuid="0e2aebef-fabe-4b35-bc82-42976f279e30" name="Quantity Sets" status="sample" override="false">
+              <Template ref="6652398e-6579-4460-8cb4-26295acfacc7" />
+            </Concept>
+            <Concept uuid="cfcae036-54c9-4036-9567-66e543112c12" name="Product Local Placement" status="sample" override="false">
+              <Template ref="cbe85b5f-7912-4a43-8bb7-1e63bf40b26d" />
+            </Concept>
+            <Concept uuid="3b88bc88-0df8-4a1a-a431-5d765b369c54" name="Box Geometry" status="sample" override="false">
+              <Template ref="b942ceb1-b818-4683-871b-9c979fa34dd5" />
+            </Concept>
+            <Concept uuid="b46eee27-1486-469a-acab-322992cdd781" name="Spatial Container" status="sample" override="false">
+              <Template ref="61dd08ed-fd01-4955-9337-8afd284a0e6f" />
+            </Concept>
+            <Concept uuid="6c0a6bdc-f649-4c0c-b0ff-028563c7b7bf" name="Building Attributes" status="sample" override="false">
+              <Template ref="40100f0d-dd58-47f3-899a-b6a5a6b4f572" />
+            </Concept>
+            <Concept uuid="25400b83-2481-41fb-9fc6-9f9763ed06a4" name="Object Predefined Type" status="sample" override="false">
+              <Template ref="25248261-98df-4d0a-9364-5653575ca421" />
+            </Concept>
+            <Concept uuid="d86adae2-cc97-4734-a863-449c89dad2b0" name="Object User Identity" status="sample" override="false">
+              <Template ref="c19ec186-9cfd-47fc-a4d4-9fb35008d04a" />
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>
