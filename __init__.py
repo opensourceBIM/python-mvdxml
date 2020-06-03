@@ -1,4 +1,4 @@
-from  . import mvdxml_expression
+from . import mvdxml_expression
 
 from xml.dom.minidom import parse, Element
 
@@ -17,7 +17,7 @@ class rule(object):
 
     def __repr__(self):
         return self.to_string()
-    
+
 class template(object):
     """
     Representation of an mvdXML template
@@ -31,17 +31,16 @@ class template(object):
             self.name = root.attributes['name'].value
         except:
             self.name = None
-        
+
     def bind(self, constraints):
         return template(self.concept, self.root, constraints, self.rules)
-        
+
     def parse(self):
-        for rules in self.root.getElementsByTagName("Rules"):
+        for rules in self.root.getElementsByTagNameNS("*", "Rules"):
             for r in rules.childNodes:
                 if not isinstance(r, Element): continue
                 self.rules.append(self.parse_rule(r))
 
-                
     def traverse(self, fn, root=None, with_parents=False):
         def visit(n, p=root, ps=[root]):
             if with_parents:
@@ -57,16 +56,16 @@ class template(object):
 
         for r in self.rules:
             visit(r)
-                
+
     def parse_rule(self, root):
         def visit(node, prefix=""):
             r = None
             n = node
             nm = None
             p = prefix
-            optional=False
-            
-            if node.tagName == "AttributeRule":
+            optional = False
+
+            if node.localName == "AttributeRule":
                 r = node.attributes["AttributeName"].value
                 try:
                     nm = node.attributes["RuleID"].value
@@ -82,29 +81,31 @@ class template(object):
                             for n in node.childNodes:
                                 if child_has_ruleid_or_prefix(n): return True
 
-                    optional = node.parentNode.tagName == "Rules" or not child_has_ruleid_or_prefix(node)
-            elif node.tagName == "EntityRule":
+                    optional = node.parentNode.localName == "Rules" or not child_has_ruleid_or_prefix(node)
+            elif node.localName == "EntityRule":
                 r = node.attributes["EntityName"].value
-            elif node.tagName == "References":
+            elif node.localName == "References":
                 ref = node.getElementsByTagName("Template")[0].attributes['ref'].value
                 n = self.concept.template(ref).root
-                try: p = p + node.attributes["IdPrefix"].value
-                except: pass
-            elif node.tagName == "Constraint":
+                try:
+                    p = p + node.attributes["IdPrefix"].value
+                except:
+                    pass
+            elif node.localName == "Constraint":
                 r = mvdxml_expression.parse(node.attributes["Expression"].value)
-                
+
             def _(n):
                 for subnode in n.childNodes:
                     if not isinstance(subnode, Element): continue
                     for x in visit(subnode, p): yield x
 
             if r:
-                yield rule(node.tagName, r, list(_(n)), (p + nm) if nm else nm, optional=optional)
+                yield rule(node.localName, r, list(_(n)), (p + nm) if nm else nm, optional=optional)
             else:
                 for subnode in n.childNodes:
                     if not isinstance(subnode, Element): continue
                     for x in visit(subnode, p): yield x
-            
+
         return list(visit(root))[0]
 
 class concept_or_applicability(object):
@@ -122,22 +123,21 @@ class concept_or_applicability(object):
             # probably applicability and not concept
             self.name = "Applicability"
 
-    def template(self, id = None):
+    def template(self, id=None):
         if id is None:
-            id = self.concept_node.getElementsByTagName("Template")[0].attributes['ref'].value
+            id = self.concept_node.getElementsByTagNameNS("*","Template")[0].attributes['ref'].value
 
-        for node in self.root.dom.getElementsByTagName("ConceptTemplate"):
+        for node in self.root.dom.getElementsByTagNameNS('*',"ConceptTemplate"):
             if node.attributes["uuid"].value == id:
                 t = template(self, node)
                 t.parse()
                 t_with_rules = t.bind(self.rules())
                 return t_with_rules
 
-
     def rules(self):
         # Get the top most TemplateRule and traverse
         try:
-            rules = self.concept_node.getElementsByTagName("TemplateRules")[0]
+            rules = self.concept_node.getElementsByTagNameNS("*","TemplateRules")[0]
         except:
             return []
 
@@ -146,9 +146,9 @@ class concept_or_applicability(object):
                 for i, r in enumerate([c for c in rules.childNodes if isinstance(c, Element)]):
                     if i:
                         yield rules.attributes["operator"].value
-                    if r.tagName == "TemplateRules":
+                    if r.localName == "TemplateRules":
                         yield visit(r)
-                    elif r.tagName == "TemplateRule":
+                    elif r.localName == "TemplateRule":
                         yield mvdxml_expression.parse(r.attributes["Parameters"].value)
                     else:
                         raise Exception()
@@ -156,7 +156,7 @@ class concept_or_applicability(object):
             return list(_())
 
         return visit(rules)
-    
+
 class concept_root(object):
     def __init__(self, dom, root):
         self.dom, self.root = dom, root
@@ -164,21 +164,21 @@ class concept_root(object):
         self.entity = str(root.attributes['applicableRootEntity'].value)
 
     def applicability(self):
-        return concept_or_applicability(self, self.root.getElementsByTagName("Applicability")[0])
-        
+        return concept_or_applicability(self, self.root.getElementsByTagNameNS("*","Applicability")[0])
+
     def concepts(self):
-        for c in self.root.getElementsByTagName("Concept"):
+        for c in self.root.getElementsByTagNameNS("*","Concept"):
             yield concept_or_applicability(self, c)
 
     @staticmethod
     def parse(fn):
         dom = parse(fn)
-        if len(dom.getElementsByTagName("ConceptRoot")):
-            for root in dom.getElementsByTagName("ConceptRoot"):
+        if len(dom.getElementsByTagNameNS("*","ConceptRoot")):
+            for root in dom.getElementsByTagNameNS("*","ConceptRoot"):
                 CR = concept_root(dom, root)
                 yield CR
         else:
-            for templ in dom.getElementsByTagName("ConceptTemplate"):
+            for templ in dom.getElementsByTagNameNS("*","ConceptTemplate"):
                 t = template(None, templ)
                 t.parse()
                 yield t
