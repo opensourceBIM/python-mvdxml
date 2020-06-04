@@ -11,7 +11,8 @@ class node(object):
 word = pp.Word(pp.alphanums+"_")
 quoted = pp.Combine("'" + word + "'")
 bool_value = pp.CaselessLiteral("TRUE") | pp.CaselessLiteral("FALSE")
-rhs = quoted | bool_value
+ref_val = word + "[" + word + "]"
+rhs = quoted | bool_value | ref_val
 stmt = (pp.Optional(word) + "[" + word + "]" + "=" + rhs).setParseAction(node)
 bool_op =  pp.CaselessLiteral("AND") | pp.CaselessLiteral("OR")
 grammar = stmt + pp.Optional(pp.OneOrMore(bool_op + stmt))
