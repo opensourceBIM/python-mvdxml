@@ -353,6 +353,19 @@ def get_non_respecting_entities(file, verification_matrix):
     return non_respecting
 
 
+
+
+def get_respecting_entities(file, verification_matrix):
+    respecting = []
+    for k, v in verification_matrix.items():
+        entity = file.by_id(k)
+        print(list(v.values()))
+        if sum(v.values()) == 0:
+            respecting.append(entity)
+
+    return respecting
+
+
 def visualize(file, not_respecting_entities):
     """
     Visualize the instances of the entity type targeted by the mvdXML ConceptRoot.
@@ -385,9 +398,12 @@ def visualize(file, not_respecting_entities):
         else:
             c = (0, 1, 0.5, 1)
 
-        shape = ifcopenshell.geom.create_shape(s, el)
-        # OCC.BRepTools.breptools_Write(shape.geometry, "test.brep")
-        ds = ifcopenshell.geom.utils.display_shape(shape, clr=c)
+        try:
+            shape = ifcopenshell.geom.create_shape(s, el)
+            # OCC.BRepTools.breptools_Write(shape.geometry, "test.brep")
+            ds = ifcopenshell.geom.utils.display_shape(shape, clr=c)
+        except:
+            pass
 
         viewer.FitAll()
 
