@@ -217,6 +217,10 @@ def export_to_xlsx(xlsx_name, concepts, all_data):
     :param all_data: Data extracted.
 
     """
+    
+    if not os.path.isdir("spreadsheet_output/"):
+        os.mkdir("spreadsheet_output/")
+        
     workbook = xlsxwriter.Workbook("spreadsheet_output/" + xlsx_name)
     worksheet = workbook.add_worksheet()
     # Formats
@@ -248,6 +252,10 @@ def export_to_csv(csv_name, concepts, all_data):
     :param concepts: List of mvdXML Concept instances.
     :param all_data: Data extracted.
     """
+    
+    if not os.path.isdir("spreadsheet_output/"):
+        os.mkdir("spreadsheet_output/")
+        
     with open('spreadsheet_output/' + csv_name, 'w', newline='') as f:
         writer = csv.writer(f)
         header = [concept.name for concept in concepts]
