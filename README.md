@@ -22,7 +22,7 @@ respecting_entities = mvd.get_respecting_entities(file, all_data[1])
 ```python
 # Create a new file
 new_file = ifcopenshell.file(schema=file.schema)
-proj= file.by_type("IfcProject")[0]
+proj = file.by_type("IfcProject")[0]
 new_file.add(proj)
 
 for e in respecting_entities:
