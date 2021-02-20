@@ -35,11 +35,11 @@ class template(object):
     def bind(self, constraints):
         return template(self.concept, self.root, constraints, self.rules)
 
-    def parse(self):
+    def parse(self, visited=None):
         for rules in self.root.getElementsByTagNameNS("*", "Rules"):
             for r in rules.childNodes:
                 if not isinstance(r, Element): continue
-                self.rules.append(self.parse_rule(r))
+                self.rules.append(self.parse_rule(r, visited=visited))
 
     def traverse(self, fn, root=None, with_parents=False):
         def visit(n, p=root, ps=[root]):
@@ -57,13 +57,14 @@ class template(object):
         for r in self.rules:
             visit(r)
 
-    def parse_rule(self, root):
-        def visit(node, prefix=""):
+    def parse_rule(self, root, visited=None):
+        def visit(node, prefix="", visited=None):
             r = None
             n = node
             nm = None
             p = prefix
             optional = False
+            visited = set() if visited is None else visited
 
             if node.localName == "AttributeRule":
                 r = node.attributes["AttributeName"].value
@@ -84,29 +85,40 @@ class template(object):
                     optional = node.parentNode.localName == "Rules" or not child_has_ruleid_or_prefix(node)
             elif node.localName == "EntityRule":
                 r = node.attributes["EntityName"].value
-            elif node.localName == "References":
-                ref = node.getElementsByTagName("Template")[0].attributes['ref'].value
-                n = self.concept.template(ref).root
-                try:
-                    p = p + node.attributes["IdPrefix"].value
-                except:
-                    pass
+            elif node.localName == "Template":
+                ref = node.attributes['ref'].value
+                # we break infinite recursion using this set
+                if ref not in visited:
+                    n = self.concept.template(ref, visited=visited | {ref}).root
+                    try:
+                        p = p + node.attributes["IdPrefix"].value
+                    except:
+                        pass
             elif node.localName == "Constraint":
                 r = mvdxml_expression.parse(node.attributes["Expression"].value)
+            elif node.localName == "EntityRules": pass
+            elif node.localName == "AttributeRules": pass
+            elif node.localName == "Rules": pass
+            elif node.localName == "Constraints": pass
+            elif node.localName == "References": pass
+            elif node.localName == "Definitions": return
+            elif node.localName == "SubTemplates": return # @todo perhaps just traverse them?
+            else:
+                raise ValueError(node.localName)
 
             def _(n):
                 for subnode in n.childNodes:
                     if not isinstance(subnode, Element): continue
-                    for x in visit(subnode, p): yield x
+                    for x in visit(subnode, p, visited=visited): yield x
 
             if r:
                 yield rule(node.localName, r, list(_(n)), (p + nm) if nm else nm, optional=optional)
             else:
                 for subnode in n.childNodes:
                     if not isinstance(subnode, Element): continue
-                    for x in visit(subnode, p): yield x
+                    for x in visit(subnode, p, visited=visited): yield x
 
-        return list(visit(root))[0]
+        return list(visit(root, visited=visited))[0]
 
 class concept_or_applicability(object):
     """
@@ -123,14 +135,14 @@ class concept_or_applicability(object):
             # probably applicability and not concept
             self.name = "Applicability"
 
-    def template(self, id=None):
+    def template(self, id=None, visited=None):
         if id is None:
             id = self.concept_node.getElementsByTagNameNS("*","Template")[0].attributes['ref'].value
 
         for node in self.root.dom.getElementsByTagNameNS('*',"ConceptTemplate"):
             if node.attributes["uuid"].value == id:
                 t = template(self, node)
-                t.parse()
+                t.parse(visited=visited)
                 t_with_rules = t.bind(self.rules())
                 return t_with_rules
 
