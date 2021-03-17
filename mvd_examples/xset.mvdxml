@@ -1,0 +1,513 @@
+<?xml version="1.0"?>
+<mvdXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" uuid="9cad09cc-c9b9-4425-85cb-0a371405013b" name="" status="sample" xsi:schemaLocation="http://www.buildingsmart-tech.org/mvd/XML/1.1 http://www.buildingsmart-tech.org/mvd/XML/1.1/mvdXML_V1.1_add1.xsd" xmlns="http://buildingsmart-tech.org/mvd/XML/1.1">
+  <Templates>
+    <ConceptTemplate uuid="33e0be15-e301-4858-9f4b-18b2eb5488ba" name="Object Definition" status="sample" applicableSchema="IFC4" applicableEntity="IfcObjectDefinition">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>The concept templates of <em>Object Definition</em> provides the means to define an object occurrence by its object type and attached property and quantity sets.</p>]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="36984334-3ac8-4e59-85a6-f68d65e379c7" name="Property Sets" status="sample" applicableSchema="IFC4" applicableEntity="IfcRoot">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>The concept template <em>Property Sets</em> describes how sets of properties (usually defined by a name, value, unit triple) are associated to objects or object types.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <SubTemplates>
+            <ConceptTemplate uuid="f74255a6-0c0e-4f31-84ad-24981db62461" name="Property Sets for Objects" version="1" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+              <Definitions>
+                <Definition>
+                  <Body><![CDATA[<p>The concept template <em>Property Sets for Objects</em> describes how an object occurrence can be related to a single or multiple property sets. A property set
+ contains a single or multiple properties. The data types of
+ an individual property are single value, enumerated value,
+ bounded value, table value, reference value, list value,
+ and combination of property occurrences.
+</p>
+  
+
+<p>Property sets can also be related to an object type, see concept <em>Property Sets for Types</em>. They then define the common properties for all occurrences of the same type. If the same property (by name) is provided by the same property set (by name), then the properties directly assigned to the object occurrence override the properties assigned to the object type.</p>
+]]></Body>
+                </Definition>
+              </Definitions>
+              <Rules>
+                <AttributeRule RuleID="PredefinedType" AttributeName="PredefinedType" />
+                <AttributeRule AttributeName="IsDefinedBy">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcRelDefinesByProperties">
+                      <AttributeRules>
+                        <AttributeRule AttributeName="RelatingPropertyDefinition">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcPropertySet">
+                              <AttributeRules>
+                                <AttributeRule RuleID="PsetName" AttributeName="Name" />
+                                <AttributeRule RuleID="Properties" AttributeName="HasProperties">
+                                  <EntityRules>
+                                    <EntityRule EntityName="IfcPropertySingleValue">
+                                      <References>
+                                        <Template ref="6655f6d0-29a8-47b8-8f3d-c9fce9c9a620" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyBoundedValue">
+                                      <References>
+                                        <Template ref="3d67a2d2-761d-44d9-a09e-b7fbb1fa5632" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyEnumeratedValue">
+                                      <References>
+                                        <Template ref="c148a099-c351-43a8-9266-5f3de0b45a95" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyListValue">
+                                      <References>
+                                        <Template ref="8e10b688-9179-4e3a-8db2-6abcaafe952d" />
+                                      </References>
+                                    </EntityRule>
+                                    <EntityRule EntityName="IfcPropertyTableValue">
+                                      <References>
+                                        <Template ref="35c947b0-6abc-4b13-8ec7-696ef2041721" />
+                                      </References>
+                                    </EntityRule>
+                                  </EntityRules>
+                                </AttributeRule>
+                              </AttributeRules>
+                            </EntityRule>
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="6652398e-6579-4460-8cb4-26295acfacc7" name="Quantity Sets" version="1" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[
+<p>
+Any specialization of object can be related to multiple quantity set occurrences. A quantity set
+ contains multiple quantity occurrences. The data type of
+ quantity occurrence values are count, length, area, volume, weight, time, or a combination of quantities. Each quantity is defined by its name, value, and optionally a description and a formula.</p>
+
+
+<p>The quantity set is expressed by instances of <em>IfcElementQuantity</em>, where the <em>Name</em> attribute determines the common designator of the quantity set. This specification contains a number of predefined quantity sets, a template definition is provided for each of them. The name of the template has to be used as the value of the <em>Name</em> attribute. The <em>MethodOfMeasurement</em> attribute specifies the method, by which the values of the individual quantities are calculated. For the quantity set templates included in this specification, the value of <em>MethodOfMeasurement</em> shall be "BaseQuantities".</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule AttributeName="IsDefinedBy">
+              <EntityRules>
+                <EntityRule EntityName="IfcRelDefinesByProperties">
+                  <AttributeRules>
+                    <AttributeRule AttributeName="RelatingPropertyDefinition">
+                      <EntityRules>
+                        <EntityRule EntityName="IfcElementQuantity">
+                          <AttributeRules>
+                            <AttributeRule RuleID="QsetName" AttributeName="Name">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="Description">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcText" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule AttributeName="MethodOfMeasurement">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcLabel" />
+                              </EntityRules>
+                            </AttributeRule>
+                            <AttributeRule RuleID="Quantities" AttributeName="Quantities">
+                              <EntityRules>
+                                <EntityRule EntityName="IfcQuantityLength">
+                                  <References>
+                                    <Template ref="dd8678e1-e300-4f70-9d63-e539db4bd11c" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityArea">
+                                  <References>
+                                    <Template ref="65ac4747-6eff-437e-94e2-643fd4e3bf86" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityVolume">
+                                  <References>
+                                    <Template ref="6491a3b0-b7e9-412a-8226-bcd91c2b0b0e" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityWeight">
+                                  <References>
+                                    <Template ref="e1016e56-3c89-4f42-9679-07e1db3c0afb" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityCount">
+                                  <References>
+                                    <Template ref="8aaeff32-572c-4f6a-ac64-e2151663cbf1" />
+                                  </References>
+                                </EntityRule>
+                                <EntityRule EntityName="IfcQuantityTime">
+                                  <References>
+                                    <Template ref="43c4c050-04de-4b0f-9e43-708bd98201a8" />
+                                  </References>
+                                </EntityRule>
+                              </EntityRules>
+                            </AttributeRule>
+                          </AttributeRules>
+                        </EntityRule>
+                      </EntityRules>
+                    </AttributeRule>
+                  </AttributeRules>
+                </EntityRule>
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="a322fdd7-cd28-4ea7-8797-f6cf124ab3d6" name="Partial Templates" status="sample" applicableSchema="IFC4">
+      <Definitions>
+        <Definition>
+          <Body><![CDATA[<p>Partial concept templates are described herein to indicate usage of common data types, which are then incorporated into other templates.</p>]]></Body>
+        </Definition>
+      </Definitions>
+      <SubTemplates>
+        <ConceptTemplate uuid="88b4aaa9-0925-447c-b009-fe357b7c754e" name="Values" status="sample" applicableSchema="IFC4" applicableEntity="IfcSimpleProperty">
+          <Definitions>
+            <Definition>
+              <Body><![CDATA[<p>Properties may contain user-defined data, where data types are open-ended.</p>]]></Body>
+            </Definition>
+          </Definitions>
+          <Rules>
+            <AttributeRule RuleID="PropertyName" AttributeName="Name">
+              <EntityRules>
+                <EntityRule EntityName="IfcIdentifier" />
+              </EntityRules>
+            </AttributeRule>
+            <AttributeRule AttributeName="Description">
+              <EntityRules>
+                <EntityRule EntityName="IfcText" />
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+          <SubTemplates>
+            <ConceptTemplate uuid="6655f6d0-29a8-47b8-8f3d-c9fce9c9a620" name="Single Value" status="sample" owner="System" applicableSchema="IFC4" applicableEntity="IfcPropertySingleValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="NominalValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="3d67a2d2-761d-44d9-a09e-b7fbb1fa5632" name="Bounded Value" status="sample" owner="System" applicableSchema="IFC4" applicableEntity="IfcPropertyBoundedValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="UpperValue" AttributeName="UpperBoundValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="LowerValue" AttributeName="LowerBoundValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="SetValue" AttributeName="SetPointValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="c148a099-c351-43a8-9266-5f3de0b45a95" name="Enumerated Value" status="sample" owner="System" applicableSchema="IFC4" applicableEntity="IfcPropertyEnumeratedValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="EnumerationValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="EnumerationReference">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcPropertyEnumeration">
+                      <AttributeRules>
+                        <AttributeRule RuleID="Reference" AttributeName="Name">
+                          <EntityRules>
+                            <EntityRule EntityName="IfcLabel" />
+                          </EntityRules>
+                        </AttributeRule>
+                      </AttributeRules>
+                    </EntityRule>
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="8e10b688-9179-4e3a-8db2-6abcaafe952d" name="List Value" status="sample" applicableSchema="IFC4" applicableEntity="IfcPropertyListValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="ListValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="35c947b0-6abc-4b13-8ec7-696ef2041721" name="Table Value" status="sample" applicableSchema="IFC4" applicableEntity="IfcPropertyTableValue">
+              <Rules>
+                <AttributeRule RuleID="PropertyName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcIdentifier" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Value" AttributeName="DefiningValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="Reference" AttributeName="DefinedValues">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcValue" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Expression">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="CurveInterpolation">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcCurveInterpolationEnum" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+        <ConceptTemplate uuid="6c03e465-c5dd-42ce-9412-bebacabd2f3b" name="Quantities" status="sample" applicableSchema="IFC4" applicableEntity="IfcPhysicalSimpleQuantity">
+          <Rules>
+            <AttributeRule RuleID="QuantityName" AttributeName="Name">
+              <EntityRules>
+                <EntityRule EntityName="IfcLabel" />
+              </EntityRules>
+            </AttributeRule>
+          </Rules>
+          <SubTemplates>
+            <ConceptTemplate uuid="dd8678e1-e300-4f70-9d63-e539db4bd11c" name="Length Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityLength">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="LengthValue" AttributeName="LengthValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLengthMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="65ac4747-6eff-437e-94e2-643fd4e3bf86" name="Area Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityArea">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="AreaValue" AttributeName="AreaValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcAreaMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="6491a3b0-b7e9-412a-8226-bcd91c2b0b0e" name="Volume Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityVolume">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="VolumeValue" AttributeName="VolumeValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcVolumeMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="e1016e56-3c89-4f42-9679-07e1db3c0afb" name="Weight Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityWeight">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="WeightValue" AttributeName="WeightValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcMassMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="8aaeff32-572c-4f6a-ac64-e2151663cbf1" name="Count Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityCount">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="CountValue" AttributeName="CountValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcCountMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+            <ConceptTemplate uuid="43c4c050-04de-4b0f-9e43-708bd98201a8" name="Time Quantity" status="sample" applicableSchema="IFC4" applicableEntity="IfcQuantityTime">
+              <Rules>
+                <AttributeRule RuleID="QuantityName" AttributeName="Name">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Description">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcText" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule RuleID="TimeValue" AttributeName="TimeValue">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcTimeMeasure" />
+                  </EntityRules>
+                </AttributeRule>
+                <AttributeRule AttributeName="Formula">
+                  <EntityRules>
+                    <EntityRule EntityName="IfcLabel" />
+                  </EntityRules>
+                </AttributeRule>
+              </Rules>
+            </ConceptTemplate>
+          </SubTemplates>
+        </ConceptTemplate>
+      </SubTemplates>
+    </ConceptTemplate>
+    <ConceptTemplate uuid="00000000-0000-0000-0000-000000000000" name="_xset" code="eead5b95-7b55-4d1c-8b71-dac234adfe38" status="sample" applicableSchema="IFC4">
+      <SubTemplates>
+        <ConceptTemplate uuid="be6755a6-b9b6-4884-b820-ea6a73a7402f" status="sample" applicableSchema="IFC4" applicableEntity="IfcObject" />
+      </SubTemplates>
+    </ConceptTemplate>
+  </Templates>
+  <Views>
+    <ModelView uuid="eead5b95-7b55-4d1c-8b71-dac234adfe38" name="xset" status="sample" applicableSchema="IFC4">
+      <ExchangeRequirements />
+      <Roots>
+        <ConceptRoot uuid="8ad3fd6c-547b-47d7-8a8b-e68d92da2566" name="IfcObject" status="sample" applicableRootEntity="IfcObject">
+          <Applicability uuid="00000000-0000-0000-0000-000000000000" status="sample">
+            <Template ref="be6755a6-b9b6-4884-b820-ea6a73a7402f" />
+            <TemplateRules operator="and" />
+          </Applicability>
+          <Concepts>
+            <Concept uuid="50ea6466-6555-424f-9179-ee5f7c0dbf62" name="qset" status="sample" override="false">
+              <Template ref="6652398e-6579-4460-8cb4-26295acfacc7" />
+            </Concept>
+            <Concept uuid="9e3151ca-7c3c-4c1b-b155-e13d30d86b2d" name="pset" status="sample" override="false">
+              <Template ref="f74255a6-0c0e-4f31-84ad-24981db62461" />
+            </Concept>
+          </Concepts>
+        </ConceptRoot>
+      </Roots>
+    </ModelView>
+  </Views>
+</mvdXML>
