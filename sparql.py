@@ -348,7 +348,7 @@ class convertor(object):
                 # G.nm = G.next_nm
 
                 if not ifcOwl.is_select(rule.attribute):
-                    # SELECT types should never be qualified as they cannot be infered
+                    # SELECT types should never be qualified as they cannot be inferred
                     bld.append(INDENT + rule_mapping[parents[-1]].name, "rdf:type", "ifcowl:" + rule.attribute)
 
                 # propagate binding name
@@ -462,7 +462,7 @@ def infer_subtypes(ttlfn):
 
     if not os.path.exists(ttlfn + ".subclass.nt"):
 
-        print("Infering supertype relationships")
+        print("Inferring supertype relationships")
 
         import hashlib
         import rdflib
