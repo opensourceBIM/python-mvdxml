@@ -48,7 +48,7 @@
  
 <li>common properties within a type driven property set;</li>
  
-<li>common geometry representations, applied as mapped representation to each occurences;</li>
+<li>common geometry representations, applied as mapped representation to each occurrences;</li>
  
 <li>common material assignments (with exception of material set usages);</li>
 <
@@ -577,7 +577,7 @@ Many object occurrences have an
       <Definitions>
         <Definition>
           <Body><![CDATA[<p>The concept of an <em>Object Association</em> provides the means to associate sources of information (most notably a 
-classification, library, document, approval, contraint, or material) to objects definitions. The information associated may reside internally or externally in regard of the project data.
+classification, library, document, approval, constraint, or material) to objects definitions. The information associated may reside internally or externally in regard of the project data.
 </p>]]></Body>
         </Definition>
       </Definitions>
@@ -764,7 +764,7 @@ NOTE&nbsp; The classification system or dictionary server that is used within th
                 <Definition>
                   <Body><![CDATA[<p>Provision of a spatial structure of the project by aggregating spatial elements. The spatial structure is a hierarchical tree of spatial elements ultimately assigned to the project. Composition refers to the relationship to a higher level element (e.g. this storey is part of a building).</p>
 
-<blockquote class="note">NOTE&nbsp; The link between the highest level spatial element and the project is provided by this concept through <em>IfcRelContainedInSpatialStructure</em> and not through declaration using <em>IfcRelDeclares</em>. This is a known anomaly intruduced to maintain compatibility with earlier versions of this standard.</blockquote>
+<blockquote class="note">NOTE&nbsp; The link between the highest level spatial element and the project is provided by this concept through <em>IfcRelContainedInSpatialStructure</em> and not through declaration using <em>IfcRelDeclares</em>. This is a known anomaly introduced to maintain compatibility with earlier versions of this standard.</blockquote>
 
 <p>The order of spatial structure elements being included in the concept for builing projects are from high to low level: <em>IfcProject</em>, <em>IfcSite</em>, <em>IfcBuilding</em>, <em>IfcBuildingStorey</em>, and <em>IfcSpace</em> with <em>IfcSite</em>, <em>IfcBuildingStorey</em> and <em>IfcSpace</em> being optional levels. Therefore an spatial structure element can only be part of an element at the same or higher level.</p>
 
@@ -808,7 +808,7 @@ NOTE&nbsp; The classification system or dictionary server that is used within th
                 <Definition>
                   <Body><![CDATA[<p>Provision of a spatial structure of the project by aggregating spatial elements. The spatial structure is a hierarchical tree of spatial elements ultimately assigned to the project. Decomposition refers to the relationship to a lower level element (e.g. this storey has spaces).</p>
 
-<blockquote class="note">NOTE&nbsp; The link between the project and the highest level spatial element is provided by this concept through <em>IfcRelContainedInSpatialStructure</em> and not through declaration using <em>IfcRelDeclares</em>. This is a known anomaly intruduced to maintain compatibility with earlier versions of this standard.</blockquote>
+<blockquote class="note">NOTE&nbsp; The link between the project and the highest level spatial element is provided by this concept through <em>IfcRelContainedInSpatialStructure</em> and not through declaration using <em>IfcRelDeclares</em>. This is a known anomaly introduced to maintain compatibility with earlier versions of this standard.</blockquote>
 
 <p>The order of spatial structure elements being included in the concept for builing projects are from low to high level: <em>IfcSpace</em>, <em>IfcBuildingStorey</em>, <em>IfcBuilding</em>, <em>IfcSite</em> and <em>IfcProject</em> with <em>IfcSite</em>, <em>IfcBuildingStorey</em> and <em>IfcSpace</em> being optional levels. Therefore an spatial structure element can only be part of an element at the same or higher level.</p>
 
@@ -861,7 +861,7 @@ NOTE&nbsp; The classification system or dictionary server that is used within th
             <Definition>
               <Body><![CDATA[<p>Spatial structures, such as site, building, storey, or spaces, may contain physical elements, including building elements, distribution elements, and furnishing elements. The containment relationship between the physical elements and the spatial structures is hierarchical, i.e. a physical element shall only be contained within a single spatial structure.</p>
 
-<blockquote class="example">EXAMPLE&nbsp; An <em>IfcBeam</em> is placed within the spatial hierarchy using the objectified relationship <em>IfcRelContainedInSpatialStructure</em>, refering to it by its inverse attribute <em>SELF\IfcElement.ContainedInStructure</em>. Subtypes of <em>IfcSpatialStructureElement</em> are valid spatial containers, with <em>IfcBuildingStorey</em> being the default container. </blockquote>
+<blockquote class="example">EXAMPLE&nbsp; An <em>IfcBeam</em> is placed within the spatial hierarchy using the objectified relationship <em>IfcRelContainedInSpatialStructure</em>, referring to it by its inverse attribute <em>SELF\IfcElement.ContainedInStructure</em>. Subtypes of <em>IfcSpatialStructureElement</em> are valid spatial containers, with <em>IfcBuildingStorey</em> being the default container. </blockquote>
 
 <p>The spatial containment relationship, together with the Spatial decomposition relationship, being hierarchical as well, establishes the hiearchical project tree structure in a building information model.</p> 
 
@@ -900,7 +900,7 @@ NOTE&nbsp; The classification system or dictionary server that is used within th
     <ConceptTemplate uuid="0e8b1397-1ac6-41e1-a6d0-f2b34688cb61" name="Product Shape" status="sample" applicableSchema="IFC4" applicableEntity="IfcProduct">
       <Definitions>
         <Definition>
-          <Body><![CDATA[<p>A product is an occurence of a physical or virtual object with finite spatial extent that may have a shape representation as one of its characteristics. The concepts within the group of <em>Product Shape</em> define how a shape is created to represent different geometric and topological representations.</p>
+          <Body><![CDATA[<p>A product is an occurrence of a physical or virtual object with finite spatial extent that may have a shape representation as one of its characteristics. The concepts within the group of <em>Product Shape</em> define how a shape is created to represent different geometric and topological representations.</p>
             ]]></Body>
         </Definition>
       </Definitions>
@@ -978,7 +978,7 @@ Placement follows aggregation and containment relationships
  electrical junction box may fill an opening within a wall,
  and the junction box may contain ports for contained
  outlets or switches; the placement of such connected
- elements is contrained relative to connected port of the
+ elements is constrained relative to connected port of the
   junction box. As another example, an air terminal may fill
  a ceiling covering which is placed relative to a space; the
  placement of a connecting duct fitting may be constrained
@@ -991,7 +991,7 @@ Placement follows aggregation and containment relationships
 
 <p>If a containing spatial structure contains a grid, then
  placement may also be based relative to grid coordinates.
- In certain use cases, an absolute placement may be used by omiting the <em>IfcObjectPlacement</em>. In this case, the shape representation is defined within the world coordinate system.
+ In certain use cases, an absolute placement may be used by omitting the <em>IfcObjectPlacement</em>. In this case, the shape representation is defined within the world coordinate system.
 </p>
 ]]></Body>
                 </Definition>
