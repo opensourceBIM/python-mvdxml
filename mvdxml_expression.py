@@ -11,7 +11,7 @@ class node(object):
 
     def __repr__(self): return "{%s[%s]=%s}" % (self.a, self.b, self.c)
 
-word = pp.Word(pp.alphanums+"_"+" "+"/")
+word = pp.Word(pp.alphanums+"_"+" "+"/"+"#")
 quoted = pp.Combine("'" + word + "'")
 bool_value = pp.CaselessLiteral("TRUE") | pp.CaselessLiteral("FALSE")
 ref_val = word + "[" + word + "]"
