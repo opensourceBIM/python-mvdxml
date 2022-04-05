@@ -24,7 +24,7 @@ if __name__ == "__main__":
 
     elif len(sys.argv) == 3:
         from . import sparql
-        ttlfn, mvdfn = sys.argv[1:]
+        mvdfn,ttlfn = sys.argv[1:]
         sparql.derive_prefix(ttlfn)
         ttlfn = sparql.infer_subtypes(ttlfn)
         for mvd in concept_root.parse(mvdfn):
