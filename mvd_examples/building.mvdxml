@@ -48,7 +48,7 @@
  
 <li>common properties within a type driven property set;</li>
  
-<li>common geometry representations, applied as mapped representation to each occurrences;</li>
+<li>common geometry representations, applied as mapped representation to each occurrence;</li>
  
 <li>common material assignments (with exception of material set usages);</li>
 <
