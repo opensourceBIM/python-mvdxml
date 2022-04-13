@@ -418,5 +418,72 @@ def visualize(file, not_respecting_entities):
     ifcopenshell.geom.utils.main_loop()
 
 
+def validate_data(concept, data):
+    import io
+    import ast
+    import operator
+    from functools import reduce, partial
+
+    rules = [x[0] for x in concept.rules() if not isinstance(x, str)]
+    
+    def transform_data(d):
+        """
+        Transform dictionary keys from tree nodes to rule ids
+        """
+        
+        return {(k.parent if k.bind is None and k.parent.bind is not None else k).bind: v for k, v in d.items()}
+
+    
+    def parse_mvdxml_token(v):
+        # @todo make more permissive and tolerant
+        return ast.literal_eval(v)
+
+
+    data = list(map(transform_data, data))
+    
+    output = io.StringIO()
+        
+    # https://stackoverflow.com/a/70227259
+    def operation_reduce(x, y):
+        """
+        Takes alternating value and function as input and
+        reduces while applying function
+        """
+        
+        if callable(x):
+            return x(y)
+        else:
+            return partial(y, x)
+            
+            
+    def apply_rules():
+    
+        for r in rules:
+        
+            def apply_data():
+            
+                for d in data:
+                                
+                    def translate(v):
+                        if isinstance(v, str):
+                            return getattr(operator, v.lower() + "_")
+                        else:
+                            if v.b == "Value":
+                                return d[v.a] == parse_mvdxml_token(v.c)
+                            elif v.b == "Type":
+                                return d[v.a].is_a(parse_mvdxml_token(v.c))
+                            
+                    r2 = list(map(translate, r))
+                    yield reduce(operation_reduce, r2)
+                
+            v = any(list(apply_data()))
+            print(("Met:" if v else "Not met:"), r, file=output)
+            yield v
+
+
+    valid = all(list(apply_rules()))
+    return valid, output.getvalue()
+
+
 if __name__ == '__main__':
     print('functions to parse MVD rules and extract IFC data/filter IFC entities from them')

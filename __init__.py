@@ -13,7 +13,7 @@ class rule(object):
 
     def to_string(self, indent=0):
         # return "%s%s%s[%s](%s%s)%s" % ("\n" if indent else "", " "*indent, self.tag, self.attribute, "".join(n.to_string(indent+2) for n in self.nodes), ("\n" + " "*indent) if len(self.nodes) else "", (" -> %s" % self.bind) if self.bind else "")
-        return "<Rule %s %s>" % (self.tag, self.attribute)
+        return "<%s %s%s>" % (self.tag, f"{self.bind}=" if self.bind else "", self.attribute)
 
     def __repr__(self):
         return self.to_string()
@@ -23,8 +23,8 @@ class template(object):
     Representation of an mvdXML template
     """
 
-    def __init__(self, concept, root, constraints=None, rules=None):
-        self.concept, self.root, self.constraints = concept, root, (constraints or [])
+    def __init__(self, concept, root, constraints=None, rules=None, parent=None):
+        self.concept, self.root, self.constraints, self.parent = concept, root, (constraints or []), parent
         self.rules = rules or []
         self.entity = str(root.attributes['applicableEntity'].value)
         try:
@@ -58,7 +58,7 @@ class template(object):
             visit(r)
 
     def parse_rule(self, root, visited=None):
-        def visit(node, prefix="", visited=None):
+        def visit(node, prefix="", visited=None, parent=None):
             r = None
             n = node
             nm = None
@@ -112,7 +112,10 @@ class template(object):
                     for x in visit(subnode, p, visited=visited): yield x
 
             if r:
-                yield rule(node.localName, r, list(_(n)), (p + nm) if nm else nm, optional=optional)
+                R = rule(node.localName, r, list(_(n)), (p + nm) if nm else nm, optional=optional)
+                for rr in R.nodes:
+                    rr.parent = R
+                yield R
             else:
                 for subnode in n.childNodes:
                     if not isinstance(subnode, Element): continue
