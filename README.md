@@ -2,8 +2,12 @@
 
 A mvdXML checker and w3c SPARQL converter, as an IfcOpenShell submodule or stand-alone.
 
+WARNING: While this repository has many useful building blocks to build software around mvdXML and IFC, there are many mvdXML dialects and not all variants are likely to be fully supported.
 
-#### Quickstart
+### Quickstart
+ 
+#### Extraction
+
 ```python
 import ifcopenshell
 from ifcopenshell.mvd import mvd
@@ -35,3 +39,33 @@ new_file.write("new_file.ifc")
 # Visualize results
 mvd.visualize(file, non_respecting_entities)
 ```
+
+##### Validation
+
+~~~py
+import ifcopenshell
+
+from ifcopenshell.mvd import mvd
+
+concept_roots = list(ifcopenshell.mvd.concept_root.parse(MVDXML_FILENAME))
+file = ifcopenshell.open(IFC_FILENAME)
+
+for concept_root in concept_roots:
+    print("ConceptRoot: ", concept_root.entity)
+    for concept in concept_root.concepts():
+        print("Concept: ", concept.name)
+
+        if len(concept.template().rules) > 1:
+            attribute_rules = []
+            for rule in concept.template().rules:
+                attribute_rules.append(rule)
+            rules_root = ifcopenshell.mvd.rule("EntityRule", concept_root.entity, attribute_rules)
+        else:
+            rules_root = concept.template().rules[0]
+
+        for inst in file.by_type(concept_root.entity):
+            data = mvd.extract_data(rules_root, inst)
+            valid, output = mvd.validate_data(concept, data)
+            print(output)
+            print("[VALID]" if valid else "[failure]", inst)
+~~~
