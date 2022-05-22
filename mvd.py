@@ -469,9 +469,9 @@ def validate_data(concept, data):
                             return getattr(operator, v.lower() + "_")
                         else:
                             if v.b == "Value":
-                                return d[v.a] == parse_mvdxml_token(v.c)
+                                return d.get(v.a) == parse_mvdxml_token(v.c)
                             elif v.b == "Type":
-                                return d[v.a].is_a(parse_mvdxml_token(v.c))
+                                return d.get(v.a) and d.get(v.a).is_a(parse_mvdxml_token(v.c))
                             
                     r2 = list(map(translate, r))
                     yield reduce(operation_reduce, r2)
