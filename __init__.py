@@ -6,6 +6,7 @@ class rule(object):
     """
     A class for representing an mvdXML EntityRule or AttributeRule
     """
+    parent = None
 
     def __init__(self, tag, attribute, nodes, bind=None, optional=False):
         self.tag, self.attribute, self.nodes, self.bind = tag, attribute, nodes, bind
