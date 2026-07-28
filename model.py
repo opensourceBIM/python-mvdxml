@@ -8,7 +8,7 @@ import itertools
 import operator
 from dataclasses import dataclass
 from functools import partial, reduce
-from typing import Any, Callable, Iterable, Iterator
+from typing import Any, Callable, Iterable, Iterator, Mapping
 
 import ifcopenshell
 
@@ -141,6 +141,20 @@ class template:
     def __post_init__(self) -> None:
         object.__setattr__(self, "rules", tuple(self.rules))
         object.__setattr__(self, "constraints", tuple(self.constraints))
+
+    @classmethod
+    def from_graphviz(
+        cls,
+        source: str,
+        *,
+        name: str | None = None,
+        references: Mapping[str, template] | None = None,
+    ) -> template:
+        """Parse a fenced buildingSMART concept graph into a template."""
+
+        from .graphviz import parse
+
+        return parse(source, name=name, references=references)
 
     def traverse(
         self,
