@@ -28,6 +28,47 @@ concept templates returns a tuple of `template` objects instead. Invalid XML
 and missing template references raise `ValueError` with the relevant document
 or template identifier. Recursive template branches are expanded once.
 
+### Graphviz concept templates
+
+The lightweight concept graphs used by the buildingSMART IFC4.x documentation
+can be read directly into the same immutable `template` representation:
+
+~~~python
+from ifcopenshell.mvd import template
+
+source = """
+This prose is ignored.
+
+```
+concept {
+    IfcObject:ObjectType -> IfcLabel
+    IfcObject:ObjectType[binding="UserDefinedType"]
+}
+```
+"""
+
+parsed_template = template.from_graphviz(
+    source,
+    name="Object Predefined Type",
+)
+~~~
+
+Only `concept {}` declarations inside triple-backtick fences are read; the
+surrounding Markdown is not parsed. Edges, attribute bindings, constraint nodes,
+and named template references follow the syntax used by buildingSMART's
+`templates_to_mvdxml.py`. Referenced templates must already be parsed and
+provided by name:
+
+~~~python
+parent = template.from_graphviz(
+    parent_source,
+    references={"Surface Color Style": surface_color_style},
+)
+~~~
+
+Reference names are matched without spaces or underscores. Graph parsing uses
+`networkx`, available through IfcOpenShell's `advanced` optional dependencies.
+
 ### Extraction
 
 Extraction returns native Python containers and IFC values.
