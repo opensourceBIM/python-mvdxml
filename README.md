@@ -1,100 +1,97 @@
 ## python-mvdxml
 
-A mvdXML checker and w3c SPARQL converter, as an IfcOpenShell submodule or stand-alone.
+An mvdXML parser, checker, and W3C SPARQL converter provided as an
+IfcOpenShell submodule.
 
-WARNING: While this repository has many useful building blocks to build software around mvdXML and IFC, there are many mvdXML dialects and not all variants are likely to be fully supported.
+> [!WARNING]
+> While this package has useful building blocks for mvdXML and IFC, there are
+> many mvdXML dialects and not all variants are fully supported.
 
-### Quickstart
- 
-#### Extraction
+### Parsing
+
+Parsed documents are immutable dataclasses. Templates and template references
+are resolved while parsing, so repeated access returns the same parsed object.
+
+```python
+from ifcopenshell.mvd import parse
+
+concept_roots = parse("mvd_examples/wall_extraction.mvdxml")
+concept_root = concept_roots[0]
+
+print(concept_root.name)
+print(concept_root.entity)
+print([concept.name for concept in concept_root.concepts()])
+```
+
+`parse()` returns a tuple of `concept_root` objects. A document containing only
+concept templates returns a tuple of `template` objects instead. Invalid XML
+and missing template references raise `ValueError` with the relevant document
+or template identifier. Recursive template branches are expanded once.
+
+### Extraction
+
+Extraction returns native Python containers and IFC values.
 
 ```python
 import ifcopenshell
-from ifcopenshell.mvd import mvd
 
-mvd_concept = mvd.open_mvd("examples/wall_extraction.mvdxml")
-file = ifcopenshell.open("Duplex_A_20110505.ifc")
+from ifcopenshell.mvd import concept_root, parse
 
-all_data = mvd.get_data(mvd_concept, file, spreadsheet_export=True)
+parsed = parse("mvd_examples/wall_extraction.mvdxml")
+root = parsed[0]
+assert isinstance(root, concept_root)
+ifc_file = ifcopenshell.open("Duplex_A_20110505.ifc")
 
-non_respecting_entities = mvd.get_non_respecting_entities(file, all_data[1])
-respecting_entities = mvd.get_respecting_entities(file, all_data[1])
-
-
+all_data, verification = root.get_data(ifc_file)
+non_respecting = root.get_non_respecting_entities(ifc_file, verification)
+respecting = root.get_respecting_entities(ifc_file, verification)
 ```
+
+The result is:
 
 ```python
-# Create a new file
-new_file = ifcopenshell.file(schema=file.schema)
-proj = file.by_type("IfcProject")[0]
-new_file.add(proj)
-
-for e in respecting_entities:
-    new_file.add(e)
-
-new_file.write("new_file.ifc")
+tuple[
+    list[dict[str, object]],  # one GlobalId-to-value mapping per concept
+    dict[str, dict[str, int]],  # GlobalId-to-concept verification matrix
+]
 ```
+
+Individual structures also expose their own behavior:
 
 ```python
-# Visualize results
-mvd.visualize(file, non_respecting_entities)
+concept = next(root.concepts())
+parsed_template = concept.template()
+entity = ifc_file.by_type(root.entity)[0]
+
+extracted = parsed_template.extract(entity)
+valid, report = concept.validate(extracted)
 ```
 
-##### Validation
+`extracted` is a list of dictionaries mapping immutable `rule` objects to IFC
+values. `valid` is a boolean and `report` is a string; validation itself does
+not print.
 
-~~~py
-import ifcopenshell
+### Visualization and export
 
-from ifcopenshell.mvd import mvd
-from colorama import Fore
-from colorama import Style
+Visualization and spreadsheet generation are deliberately outside this
+package. Use the returned GlobalIds to select or colour entities in the caller's
+viewer. For CSV, JSON, dataframe, or spreadsheet output, transform `all_data`
+and `verification` with the corresponding Python library. Keeping those
+operations at the application boundary means importing this package does not
+initialize a geometry backend or require a spreadsheet dependency.
 
-concept_roots = list(ifcopenshell.mvd.concept_root.parse(MVDXML_FILENAME))
-file = ifcopenshell.open(IFC_FILENAME)
+### Command line
 
-tt = 0 # total number of tests
-ts = 0 # total number of successful tests
+Inspect a document:
 
-for concept_root in concept_roots:
-    print("ConceptRoot: ", concept_root.entity)
-    for concept in concept_root.concepts():
-        tt = tt + 1
-        print("Concept: ", concept.name)
-        try:
+```console
+python -m ifcopenshell.mvd mvd_examples/wall_extraction.mvdxml
+```
 
-            if len(concept.template().rules) > 1:
-                attribute_rules = []
-                for rule in concept.template().rules:
-                    attribute_rules.append(rule)
-                rules_root = ifcopenshell.mvd.rule("EntityRule", concept_root.entity, attribute_rules)
-            else:
-                rules_root = concept.template().rules[0]
-            ts = ts + 1
-            finst = 0 #failed instances
+Generate and execute SPARQL against an IFC-OWL Turtle file:
 
-            for inst in file.by_type(concept_root.entity):
-                try:
-                    data = mvd.extract_data(rules_root, inst)
-                    valid, output = mvd.validate_data(concept, data)
-                    if not valid:
-                        finst = finst + 1
-                    print("[VALID]" if valid else Fore.RED +"[failure]"+Style.RESET_ALL, inst)
-                    print(output)
-                except Exception as e:
-                    print(Fore.RED+"EXCEPTION: ", e, Style.RESET_ALL,inst)
-                    print ()
-            print (int(finst), "out of", int(len(file.by_type(concept_root.entity))), "instances failed the check")
-            print ("---------------------------------")
-        except Exception as e:
-            print("EXCEPTION: "+Fore.RED,e,Style.RESET_ALL)
-            print("---------------------------------")
-    print("---------------------------------")
-print("---------------------------------")
+```console
+python -m ifcopenshell.mvd model.mvdxml model.ttl
+```
 
-tf = tt-ts # total number of failed tests
-
-print ("\nRESULTS OVERVIEW")
-print ("Total number of tests: ",tt)
-print ("Total number of executed tests: ", ts)
-print ("Total number of failed tests: ", tf)
-~~~
+Use `python -m ifcopenshell.mvd --help` for argument details.
