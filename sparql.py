@@ -10,7 +10,8 @@ import ifcopenshell
 
 from collections import defaultdict
 
-import mvdxml_expression
+from . import mvdxml_expression
+
 
 def camel(s):
     """
@@ -20,28 +21,31 @@ def camel(s):
     """
 
     s = s.title().replace(" ", "")
-    if s.endswith("s"): s = s[:-1]
+    if s.endswith("s"):
+        s = s[:-1]
     return s[0].lower() + s[1:]
 
 
 STANDARD_PREFIXES = {
-    'rdf': '<http://www.w3.org/1999/02/22-rdf-syntax-ns#>',
-    'owl': '<http://www.w3.org/2002/07/owl#>',
-    'xsd': '<http://www.w3.org/2001/XMLSchema#>',
-    'list':  '<https://w3id.org/list#>',
-    'ifcowl': '',
-    'express': '<https://w3id.org/express#>',
+    "rdf": "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>",
+    "owl": "<http://www.w3.org/2002/07/owl#>",
+    "xsd": "<http://www.w3.org/2001/XMLSchema#>",
+    "list": "<https://w3id.org/list#>",
+    "ifcowl": "",
+    "express": "<https://w3id.org/express#>",
 }
+
 
 def derive_prefix(ttlfn):
     with open(ttlfn, "r") as f:
         for ln in f:
             ln.strip()
             if ln.startswith("@prefix ifcowl"):
-                uri = ln.split(':', 1)[1].strip()[:-1].strip()
-                print("Detected ifcowl prefix", uri)
-                STANDARD_PREFIXES['ifcowl'] = uri
-                break
+                uri = ln.split(":", 1)[1].strip()[:-1].strip()
+                STANDARD_PREFIXES["ifcowl"] = uri
+                return uri
+    raise ValueError(f"No ifcowl prefix found in {ttlfn!r}")
+
 
 def withschema(fn):
     """
@@ -54,19 +58,23 @@ def withschema(fn):
     """
 
     def _(*args, **kwargs):
-        schema_name = STANDARD_PREFIXES['ifcowl'].split('/')[-1][:-2]
+        schema_name = STANDARD_PREFIXES["ifcowl"].split("/")[-1][:-2]
         if "_" in schema_name:
-            schema_name = schema_name.split('_')[0]
+            schema_name = schema_name.split("_")[0]
         S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name)
         return fn(S, *args, **kwargs)
+
     return _
 
+
 noop = lambda *args: None
+
 
 class rule_binding(object):
     """
     Object for mapping rules to generated SPARQL variables
     """
+
     def __init__(self):
         pass
 
@@ -85,8 +93,8 @@ class builder(object):
             for i, pos in enumerate(stmt[1:]):
                 for po in pos.split("/"):
                     if ":" in pos:
-                        a, b = po.split(':')
-                        self.prefixes[a] = ''
+                        a, b = po.split(":")
+                        self.prefixes[a] = ""
         self.statements.append(stmt)
 
     def bind(self, di):
@@ -99,16 +107,19 @@ class builder(object):
     def __repr__(self):
         def f(s):
             S = " ".join(s)
-            if len(s) == 3: S += ' .'
+            if len(s) == 3:
+                S += " ."
             return S
 
         def g(s):
             return "PREFIX %s: %s" % s
 
-        return "\n".join(itertools.chain(
-            (g(s) for s in self.prefixes.items()),
-            (f(s) for s in self.statements)
-        ))
+        return "\n".join(
+            itertools.chain(
+                (g(s) for s in self.prefixes.items()), (f(s) for s in self.statements)
+            )
+        )
+
 
 class ifcOwl(object):
     """
@@ -126,14 +137,15 @@ class ifcOwl(object):
         :return:
         """
 
-        a, b = entity.split('#')
+        a, b = entity.split("#")
         try:
             en = S.declaration_by_name(b)
             if en.__class__.__name__ == "entity":
                 while en.supertype():
                     yield "%s#%s" % (a, en.supertype().name())
                     en = en.supertype()
-        except: pass
+        except:
+            pass
 
     @staticmethod
     def get_names(e, c):
@@ -188,7 +200,9 @@ class ifcOwl(object):
             while isinstance(ty, ifcopenshell.ifcopenshell_wrapper.type_declaration):
                 is_boxed = True
                 ty = ty.declared_type()
-            if is_boxed and isinstance(ty, ifcopenshell.ifcopenshell_wrapper.simple_type):
+            if is_boxed and isinstance(
+                ty, ifcopenshell.ifcopenshell_wrapper.simple_type
+            ):
                 ty = ty.declared_type()
                 return "express:has%s%s" % (ty[0].upper(), ty[1:])
 
@@ -210,15 +224,19 @@ class ifcOwl(object):
         while True:
             st = en.supertype()
 
-            attribute_names = ifcOwl.get_names(en, "all_attributes") | \
-                ifcOwl.get_names(en, "all_inverse_attributes")
+            attribute_names = ifcOwl.get_names(en, "all_attributes") | ifcOwl.get_names(
+                en, "all_inverse_attributes"
+            )
 
             if st:
-                attribute_names -= ifcOwl.get_names(st, "all_attributes") | \
-                    ifcOwl.get_names(st, "all_inverse_attributes")
+                attribute_names -= ifcOwl.get_names(
+                    st, "all_attributes"
+                ) | ifcOwl.get_names(st, "all_inverse_attributes")
 
             if attribute in attribute_names:
-                return "ifcowl:" + attribute[0].lower() + attribute[1:] + "_" + en.name()
+                return (
+                    "ifcowl:" + attribute[0].lower() + attribute[1:] + "_" + en.name()
+                )
 
             en = st
 
@@ -253,13 +271,15 @@ class ifcOwl(object):
 
         en = S.declaration_by_name(entity)
         attrs = [a for a in en.all_inverse_attributes() if a.name() == attribute]
-        if not attrs: return False, False
+        if not attrs:
+            return False, False
 
         a = attrs[0]
         assert a.type_of_aggregation_string() == "set"
         entity = a.entity_reference().name()
         attr = a.attribute_reference().name()
         return "ifcowl:" + entity, ifcOwl.name(entity, attr)
+
 
 class convertor(object):
 
@@ -278,8 +298,8 @@ class convertor(object):
 
         bld = builder()
         t = concept.template()
-        bld.append("# %s" % camel(concept.root.name))
-        convertor.template(t, bld, concept.root.entity)
+        bld.append("# %s" % camel(concept.root_name))
+        convertor.template(t, bld, concept.root_entity)
         bld.bind(STANDARD_PREFIXES)
 
         return bld
@@ -299,7 +319,7 @@ class convertor(object):
         return b
 
     @staticmethod
-    def template(template, bld = None, rootEntity = None):
+    def template(template, bld=None, rootEntity=None):
         if bld is None:
             bld = builder()
 
@@ -324,7 +344,7 @@ class convertor(object):
         bld.append("?URI", "ifcowl:globalId_IfcRoot/express:hasString", "?GlobalId")
 
         nm = "?URI"
-        ROOT = type('_', (), {'attribute': rootEntity})()
+        ROOT = type("_", (), {"attribute": rootEntity})()
         # rule_stack = [ROOT]
         # name_stack = [nm]
         # callback_stack = [noop]
@@ -349,7 +369,11 @@ class convertor(object):
 
                 if not ifcOwl.is_select(rule.attribute):
                     # SELECT types should never be qualified as they cannot be inferred
-                    bld.append(INDENT + rule_mapping[parents[-1]].name, "rdf:type", "ifcowl:" + rule.attribute)
+                    bld.append(
+                        INDENT + rule_mapping[parents[-1]].name,
+                        "rdf:type",
+                        "ifcowl:" + rule.attribute,
+                    )
 
                 # propagate binding name
                 rule_mapping[rule].name = rule_mapping[parents[-1]].name
@@ -373,7 +397,9 @@ class convertor(object):
 
                 if rule.bind:
                     if len(rule.nodes) == 1:
-                        indirect = ifcOwl.is_boxed(parents[-1].attribute, rule.attribute, predCount=bld.x())
+                        indirect = ifcOwl.is_boxed(
+                            parents[-1].attribute, rule.attribute, predCount=bld.x()
+                        )
 
                 if rule.bind and not indirect:
                     next_nm = "?" + rule.bind
@@ -382,7 +408,9 @@ class convertor(object):
 
                 rule_mapping[rule].name = next_nm
 
-                inventy, invattr = ifcOwl.is_inverse(parents[-1].attribute, rule.attribute)
+                inventy, invattr = ifcOwl.is_inverse(
+                    parents[-1].attribute, rule.attribute
+                )
                 if invattr:
                     # This seems not to be necessary, because the entity name is also stated in mvdXML
                     # q.append(
@@ -391,15 +419,13 @@ class convertor(object):
                     #     inventy
                     # )
                     bld.append(
-                        INDENT + next_nm,
-                        invattr,
-                        rule_mapping[parents[-1]].name
+                        INDENT + next_nm, invattr, rule_mapping[parents[-1]].name
                     )
                 else:
                     bld.append(
                         INDENT + rule_mapping[parents[-1]].name,
                         ifcOwl.name(parents[-1].attribute, rule.attribute),
-                        next_nm
+                        next_nm,
                     )
 
                 if rule.bind and indirect:
@@ -422,7 +448,7 @@ class convertor(object):
         # while callback_stack:
         #     callback_stack.pop()()
 
-        if template.params:
+        if template.constraints:
             bld.append(convertor.build_filter(template))
 
         bld.append("}")
@@ -434,7 +460,7 @@ class convertor(object):
         def v(p):
             if isinstance(p, mvdxml_expression.node):
                 if p.b == "Value":
-                    if p.c.lower() in {'true', 'false'}:
+                    if p.c.lower() in {"true", "false"}:
                         yield "(%s?%s)" % ("!" if p.c.lower() == "false" else "", p.a)
                     else:
                         yield "(?%s = %s)" % (p.a, p.c)
@@ -443,26 +469,21 @@ class convertor(object):
                 else:
                     raise Exception("Unsupported " + p.b)
             elif isinstance(p, str):
-                yield {
-                    "and": "&&",
-                    "or": "||",
-                    "not": "&& !"
-                }[p.lower()]
+                yield {"and": "&&", "or": "||", "not": "&& !"}[p.lower()]
             else:
                 yield "("
                 for q in p:
                     yield from v(q)
                 yield ")"
 
-        return "FILTER(%s)" % " ".join(v(self.params))
+        return "FILTER(%s)" % " ".join(v(self.constraints))
+
 
 def infer_subtypes(ttlfn):
     # Disabled currently
     return ttlfn
 
     if not os.path.exists(ttlfn + ".subclass.nt"):
-
-        print("Inferring supertype relationships")
 
         import hashlib
         import rdflib
@@ -508,10 +529,12 @@ def infer_subtypes(ttlfn):
 
     ttlfn += ".subclass.nt"
 
-if platform.system() == "Windows":
-    JENA_SPARQL = os.path.join(os.environ.get("JENA_HOME"), "bat", "sparql.bat")
+
+if platform.system() == "Windows" and (jena_home := os.environ.get("JENA_HOME")):
+    JENA_SPARQL = os.path.join(jena_home, "bat", "sparql.bat")
 else:
     JENA_SPARQL = "sparql"
+
 
 class executor(object):
     @staticmethod
@@ -525,6 +548,8 @@ class executor(object):
         :return:
         """
 
+        report = io.StringIO()
+
         def dict_to_list(headers):
             return lambda di: [di[h] for h in headers]
 
@@ -534,19 +559,28 @@ class executor(object):
                 print(query, file=f)
 
             proc = subprocess.Popen(
-                [JENA_SPARQL, "--data=" + ttlfn, "--query=" + sparqlfn, "--results=CSV"],
+                [
+                    JENA_SPARQL,
+                    "--data=" + ttlfn,
+                    "--query=" + sparqlfn,
+                    "--results=CSV",
+                ],
                 stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE)
+                stderr=subprocess.PIPE,
+            )
             stdout, stderr = proc.communicate()
 
-            csvf = io.StringIO(stdout.decode('utf-8'))
+            csvf = io.StringIO(stdout.decode("utf-8"))
 
             return list(csv.DictReader(csvf))
 
         root_query = convertor.root(CR.entity)
         roots = execute(root_query, 0)
 
-        print("\nFile contains %d elements of type %s" % (len(roots), CR.entity))
+        print(
+            "\nFile contains %d elements of type %s" % (len(roots), CR.entity),
+            file=report,
+        )
 
         passing_all = {}
 
@@ -556,7 +590,9 @@ class executor(object):
         try:
             # Full MVD with multiple concepts
             is_template = False
-            concept_enumerator = list(itertools.chain([CR.applicability()], CR.concepts()))
+            concept_enumerator = list(
+                itertools.chain([CR.applicability()], CR.concepts())
+            )
         except:
             is_template = True
             concept_enumerator = [CR]
@@ -566,44 +602,71 @@ class executor(object):
             num_columns += 1
 
             if is_template or ci > 1:
-                print("\n%s" % C.name)
+                print("\n%s" % C.name, file=report)
             else:
-                print("\nApplicability")
+                print("\nApplicability", file=report)
 
             query = convertor.convert(C)
 
-            print("\nSPARQL query")
-            print("============")
-            print(query)
+            print("\nSPARQL query", file=report)
+            print("============", file=report)
+            print(query, file=report)
 
             passing = execute(query, ci, 1)
-            passing_guids = set(r['GlobalId'] for r in passing)
+            passing_guids = set(r["GlobalId"] for r in passing)
 
-            print("\nElements passing")
-            print(tabulate.tabulate(list(map(dict_to_list(query.args), passing)), query.args, tablefmt="grid"))
+            print("\nElements passing", file=report)
+            print(
+                tabulate.tabulate(
+                    list(map(dict_to_list(query.args), passing)),
+                    query.args,
+                    tablefmt="grid",
+                ),
+                file=report,
+            )
 
-            print("\nElements failing concept")
+            print("\nElements failing concept", file=report)
             hd = ["URI", "GlobalId"]
-            print(tabulate.tabulate(
-                list(map(dict_to_list(hd), [r for r in roots if r["GlobalId"] not in passing_guids])), hd,
-                tablefmt="grid"))
+            print(
+                tabulate.tabulate(
+                    list(
+                        map(
+                            dict_to_list(hd),
+                            [r for r in roots if r["GlobalId"] not in passing_guids],
+                        )
+                    ),
+                    hd,
+                    tablefmt="grid",
+                ),
+                file=report,
+            )
 
             passing_all[ci] = passing_guids
 
-        print("\nSummary")
+        print("\nSummary", file=report)
 
         for ci, C in enumerate(concept_enumerator):
-            print("(%d) %s" % (ci+(0 if is_template else 0), C.name))
+            print("(%d) %s" % (ci + (0 if is_template else 0), C.name), file=report)
 
         def get_stats(guid):
             v = lambda i: guid in passing_all[i]
             st = [guid] + ["x" if v(i) else "" for i in range(num_columns)]
             if not is_template:
-                st += ["x" if not v(0) or all(v(i) for i in range(1, num_columns)) else " "]
+                st += [
+                    "x" if not v(0) or all(v(i) for i in range(1, num_columns)) else " "
+                ]
             return st
 
         hd = ["GlobalId"] + list(map(str, range(num_columns)))
         if not is_template:
             hd += ["Valid"]
 
-        print(tabulate.tabulate(list(map(get_stats, map(operator.itemgetter("GlobalId"), roots))), hd, tablefmt="grid"))
+        print(
+            tabulate.tabulate(
+                list(map(get_stats, map(operator.itemgetter("GlobalId"), roots))),
+                hd,
+                tablefmt="grid",
+            ),
+            file=report,
+        )
+        return report.getvalue()
