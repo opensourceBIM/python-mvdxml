@@ -2,6 +2,7 @@
 
 import pytest
 
+import ifcopenshell
 from ifcopenshell.mvd import rule, template
 
 
@@ -117,7 +118,46 @@ concept {
 ```
 """
 
-    with pytest.raises(
-        ValueError, match="Unknown Graphviz template reference: Surface_Color_Style"
-    ):
+    with pytest.raises(ValueError, match="Unknown Graphviz template reference: Surface_Color_Style"):
         template.from_graphviz(source)
+
+
+def test_from_graphviz_entity_leaf_filters_ifc_type() -> None:
+    source = """\
+```
+concept {
+    IfcRelDefinesByProperties:RelatingPropertyDefinition -> IfcPropertySetDefinitionSet
+}
+```
+"""
+    parsed = template.from_graphviz(source)
+
+    class entity(ifcopenshell.entity_instance):
+        def __init__(self, ifc_class: str):
+            self.ifc_class = ifc_class
+
+        def is_a(self, ifc_class: str) -> bool:
+            return self.ifc_class == ifc_class
+
+    class relationship:
+        def __init__(self, relating_property_definition: entity):
+            self.RelatingPropertyDefinition = relating_property_definition
+
+    assert parsed.extract(relationship(entity("IfcPropertySetDefinitionSet")))
+    assert not parsed.extract(relationship(entity("IfcPropertySet")))
+
+
+def test_from_graphviz_leaf_uses_parent_attribute_binding() -> None:
+    source = """\
+```
+concept {
+    IfcPointByDistanceExpression:BasisCurve -> IfcCurve
+    IfcPointByDistanceExpression:BasisCurve[binding="BasisCurve"]
+}
+```
+"""
+
+    parsed = template.from_graphviz(source)
+    leaf = parsed.rules[0].nodes[0]
+
+    assert parsed.binding_for(leaf) == "BasisCurve"

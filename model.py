@@ -77,6 +77,12 @@ class rule:
                 except (AttributeError, TypeError):
                     return [{self: "Invalid Attribute"}]
                 return [{self: value}]
+            if (
+                self.tag == "EntityRule"
+                and isinstance(ifc_data, ifcopenshell.entity_instance)
+                and not ifc_data.is_a(self.attribute)
+            ):
+                return []
             return [{self: ifc_data}]
 
         if self.tag == "AttributeRule":
@@ -192,10 +198,10 @@ class template:
     def binding_for(self, target: rule) -> str | None:
         binding: str | None = None
 
-        def find(current: rule, parent: rule | None) -> None:
+        def find(rule: rule, parent: rule | None) -> None:
             nonlocal binding
-            if current is target:
-                binding = current.bind or (parent.bind if parent else None)
+            if rule is target:
+                binding = rule.bind or (parent.bind if parent else None)
 
         self.traverse(find)
         return binding
