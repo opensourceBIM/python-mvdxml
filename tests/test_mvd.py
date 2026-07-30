@@ -142,3 +142,10 @@ def test_extract_formats_referenced_entity_global_id(
         )
         == "reference-guid"
     )
+
+
+def test_top_level_unbound_rule_has_no_parent_binding() -> None:
+    top_level = rule("AttributeRule", "Status")
+    parsed_template = template("IfcWall", "Status", (top_level,))
+
+    assert parsed_template.binding_for(top_level) is None
