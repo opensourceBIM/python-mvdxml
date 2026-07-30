@@ -32,6 +32,12 @@ def _merge_dictionaries(dicts: Iterable[dict[rule, Any]]) -> dict[rule, Any]:
     return result
 
 
+def _format_export_value(value: Any) -> Any:
+    if isinstance(value, ifcopenshell.entity_instance):
+        return getattr(value, "GlobalId", None) or str(value)
+    return value
+
+
 def _format_data_from_nodes(recurse_output: extracted_data) -> Any:
     if len(recurse_output) > 1:
         return [
@@ -45,9 +51,9 @@ def _format_data_from_nodes(recurse_output: extracted_data) -> Any:
         if len(values) > 1:
             for value in values:
                 if not isinstance(value, str):
-                    return value
-            return values
-        return values[0]
+                    return _format_export_value(value)
+            return list(map(_format_export_value, values))
+        return _format_export_value(values[0])
 
     return []
 
@@ -272,14 +278,19 @@ class concept_or_applicability:
                             if isinstance(value, str):
                                 return getattr(operator, value.lower() + "_")
                             if value.b in {"Value", None}:
-                                return values.get(value.a) == _parse_mvdxml_token(value.c)
+                                return values.get(value.a) == _parse_mvdxml_token(
+                                    value.c
+                                )
                             if value.b == "Type":
                                 item = values.get(value.a)
                                 return bool(
-                                    item is not None and item.is_a(_parse_mvdxml_token(value.c))
+                                    item is not None
+                                    and item.is_a(_parse_mvdxml_token(value.c))
                                 )
                             if value.b == "Exists":
-                                return (values.get(value.a) is not None) == _parse_mvdxml_token(value.c)
+                                return (
+                                    values.get(value.a) is not None
+                                ) == _parse_mvdxml_token(value.c)
                             raise ValueError(
                                 f"Unsupported template rule operand: {value.b}"
                             )
