@@ -204,10 +204,7 @@ def correct_for_export(all_data):
                     d[k] = 0
 
             elif isinstance(v, ifcopenshell.entity_instance):
-                if g := getattr(v, 'GlobalId', None):
-                    d[k] = g
-                else:
-                    d[k] = str(v)
+                d[k] = v[0]
     return all_data
 
 
