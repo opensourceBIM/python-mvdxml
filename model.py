@@ -17,6 +17,14 @@ concept_data = dict[str, Any]
 verification_matrix = dict[str, dict[str, int]]
 
 
+def _parse_mvdxml_token(value: str) -> Any:
+    if value.lower() == "true":
+        return True
+    if value.lower() == "false":
+        return False
+    return ast.literal_eval(value)
+
+
 def _merge_dictionaries(dicts: Iterable[dict[rule, Any]]) -> dict[rule, Any]:
     result: dict[rule, Any] = {}
     for value in dicts:
@@ -263,13 +271,15 @@ class concept_or_applicability:
                         def translate(value: Any) -> Any:
                             if isinstance(value, str):
                                 return getattr(operator, value.lower() + "_")
-                            if value.b == "Value":
-                                return values.get(value.a) == ast.literal_eval(value.c)
+                            if value.b in {"Value", None}:
+                                return values.get(value.a) == _parse_mvdxml_token(value.c)
                             if value.b == "Type":
                                 item = values.get(value.a)
                                 return bool(
-                                    item and item.is_a(ast.literal_eval(value.c))
+                                    item is not None and item.is_a(_parse_mvdxml_token(value.c))
                                 )
+                            if value.b == "Exists":
+                                return (values.get(value.a) is not None) == _parse_mvdxml_token(value.c)
                             raise ValueError(
                                 f"Unsupported template rule operand: {value.b}"
                             )
