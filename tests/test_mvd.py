@@ -14,6 +14,7 @@ from ifcopenshell.mvd import (
 )
 from ifcopenshell.mvd.__main__ import build_parser
 from ifcopenshell.mvd.mvdxml_expression import parse as parse_expression
+from ifcopenshell.mvd import model
 
 
 EXAMPLES = Path(__file__).parents[1] / "mvd_examples"
@@ -125,3 +126,19 @@ def test_validate_handles_unqualified_value_and_missing_type() -> None:
     valid, _ = concept.validate([{status: "complete"}])
 
     assert not valid
+
+
+def test_extract_formats_referenced_entity_global_id(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class entity_instance:
+        GlobalId = "reference-guid"
+
+    monkeypatch.setattr(model.ifcopenshell, "entity_instance", entity_instance)
+
+    assert (
+        model._format_data_from_nodes(
+            [{rule("AttributeRule", "Ref"): entity_instance()}]
+        )
+        == "reference-guid"
+    )
