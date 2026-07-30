@@ -13,6 +13,7 @@ from ifcopenshell.mvd import (
     template,
 )
 from ifcopenshell.mvd.__main__ import build_parser
+from ifcopenshell.mvd.mvdxml_expression import parse as parse_expression
 
 
 EXAMPLES = Path(__file__).parents[1] / "mvd_examples"
@@ -98,3 +99,29 @@ def test_cli_uses_argparse_for_optional_ifcowl_input() -> None:
     assert inspect_args.mvdxml == "model.mvdxml"
     assert inspect_args.ifcowl is None
     assert sparql_args.ifcowl == "model.ttl"
+
+
+def test_validate_supports_exists_and_boolean_literals() -> None:
+    status = rule("AttributeRule", "Status", bind="Status")
+    concept = concept_or_applicability(
+        "status",
+        template("IfcWall", "Status", (status,)),
+        parse_expression("Status[Exists]=TRUE"),
+    )
+
+    valid, _ = concept.validate([{status: "complete"}])
+
+    assert valid
+
+
+def test_validate_handles_unqualified_value_and_missing_type() -> None:
+    status = rule("AttributeRule", "Status", bind="Status")
+    concept = concept_or_applicability(
+        "status",
+        template("IfcWall", "Status", (status,)),
+        parse_expression("Status='complete'; Status[Type]='IfcLabel'"),
+    )
+
+    valid, _ = concept.validate([{status: "complete"}])
+
+    assert not valid
