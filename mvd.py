@@ -1,11 +1,11 @@
 import ifcopenshell
 import ifcopenshell.geom
 
-import os
 import itertools
+import os
 
-import csv
 import xlsxwriter
+import csv
 
 
 def is_applicability(concept):
@@ -431,14 +431,10 @@ def validate_data(concept, data):
         Transform dictionary keys from tree nodes to rule ids
         """
         
-        return {(k.parent if k.bind is None and (k.parent is not None and k.parent.bind is not None) else k).bind: v for k, v in d.items()}
+        return {(k.parent if k.bind is None and k.parent.bind is not None else k).bind: v for k, v in d.items()}
 
     
     def parse_mvdxml_token(v):
-        if v.lower() == "true":
-            return True
-        if v.lower() == "false":
-            return False
         # @todo make more permissive and tolerant
         return ast.literal_eval(v)
 
@@ -472,14 +468,10 @@ def validate_data(concept, data):
                         if isinstance(v, str):
                             return getattr(operator, v.lower() + "_")
                         else:
-                            if v.b == "Value" or v.b is None:
+                            if v.b == "Value":
                                 return d.get(v.a) == parse_mvdxml_token(v.c)
                             elif v.b == "Type":
-                                return d.get(v.a) is not None and d.get(v.a).is_a(parse_mvdxml_token(v.c))
-                            elif v.b == "Exists":
-                                return (d.get(v.a) is not None) == parse_mvdxml_token(v.c)
-                            else:
-                                raise RuntimeError(f"Invalid rule predicate {v.b}")
+                                return d.get(v.a) and d.get(v.a).is_a(parse_mvdxml_token(v.c))
                             
                     r2 = list(map(translate, r))
                     yield reduce(operation_reduce, r2)
