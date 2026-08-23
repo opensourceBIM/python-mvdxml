@@ -1,5 +1,7 @@
 # This file was generated with the assistance of an AI coding tool.
 
+from unittest import mock
+
 import pytest
 
 import ifcopenshell
@@ -132,12 +134,13 @@ concept {
 """
     parsed = template.from_graphviz(source)
 
-    class entity(ifcopenshell.entity_instance):
-        def __init__(self, ifc_class: str):
-            self.ifc_class = ifc_class
-
-        def is_a(self, ifc_class: str) -> bool:
-            return self.ifc_class == ifc_class
+    def entity(ifc_class: str) -> ifcopenshell.entity_instance:
+        # A Mock passes the isinstance() check in rule.extract() without
+        # subclassing entity_instance, whose __setattr__/__getattr__ require
+        # wrapped_data and otherwise recurse.
+        instance = mock.Mock(spec=ifcopenshell.entity_instance)
+        instance.is_a.side_effect = lambda cls: cls == ifc_class
+        return instance
 
     class relationship:
         def __init__(self, relating_property_definition: entity):
