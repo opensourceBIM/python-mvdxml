@@ -12,17 +12,46 @@ from typing import Any, Callable, Iterable, Iterator, Mapping
 
 import ifcopenshell
 
+from . import mvdxml_expression
+
 extracted_data = list[dict["rule", Any]]
 concept_data = dict[str, Any]
 verification_matrix = dict[str, dict[str, int]]
 
 
 def _parse_mvdxml_token(value: str) -> Any:
+    value = value.strip()
     if value.lower() == "true":
         return True
     if value.lower() == "false":
         return False
-    return ast.literal_eval(value)
+    try:
+        return ast.literal_eval(value)
+    except (ValueError, SyntaxError):
+        # mvdXML parameters are frequently unquoted identifiers or namespaced
+        # codes, e.g. ``ContextType=Model`` or ``CRSName[Value]=EPSG:5555``.
+        return value
+
+
+def _iter_expressions(tree: Iterable[Any]) -> Iterator[tuple[Any, ...]]:
+    """Yield every expression in a ``TemplateRules`` tree.
+
+    ``parser.parse_template_rules`` produces a nested tuple tree:
+    TemplateRules group -> TemplateRule (the ``;``-separated expressions of
+    one ``Parameters`` attribute) -> expression (tokens: ``node`` | ``AND`` |
+    ``OR``). Operators *between* sibling rules are strings and are skipped:
+    every expression must hold. Callers may therefore pass either a full
+    parser tree or a bare ``mvdxml_expression.parse()`` result.
+    """
+    for item in tree:
+        if isinstance(item, str):
+            continue
+        if item and all(
+            isinstance(token, (mvdxml_expression.node, str)) for token in item
+        ):
+            yield tuple(item)
+        else:
+            yield from _iter_expressions(item)
 
 
 def _merge_dictionaries(dicts: Iterable[dict[rule, Any]]) -> dict[rule, Any]:
@@ -252,7 +281,7 @@ class concept_or_applicability:
         return extracted_entities_data
 
     def validate(self, data: extracted_data) -> tuple[bool, str]:
-        rules = [value[0] for value in self.rules() if not isinstance(value, str)]
+        rules = list(_iter_expressions(self.rules()))
 
         def transform_data(values: dict[rule, Any]) -> dict[str | None, Any]:
             return {
@@ -283,8 +312,10 @@ class concept_or_applicability:
                                 )
                             if value.b == "Type":
                                 item = values.get(value.a)
+                                # Non-entity values (str, float, ...) have no
+                                # IFC type: the type test simply does not hold.
                                 return bool(
-                                    item is not None
+                                    isinstance(item, ifcopenshell.entity_instance)
                                     and item.is_a(_parse_mvdxml_token(value.c))
                                 )
                             if value.b == "Exists":
