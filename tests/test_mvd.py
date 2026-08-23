@@ -149,3 +149,64 @@ def test_top_level_unbound_rule_has_no_parent_binding() -> None:
     parsed_template = template("IfcWall", "Status", (top_level,))
 
     assert parsed_template.binding_for(top_level) is None
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("Model", "Model"),  # ContextType[Value]=Model
+        ("IfcLocalPlacement", "IfcLocalPlacement"),  # entity name as a parameter
+        ("EPSG:5555", "EPSG:5555"),  # not valid Python syntax either
+        (" QTO_OCCURRENCEDRIVEN ", "QTO_OCCURRENCEDRIVEN"),
+        ("'IfcLabel'", "IfcLabel"),  # quoted literals keep working
+        ("TRUE", True),
+        ("42", 42),
+    ],
+)
+def test_parse_mvdxml_token_falls_back_to_the_raw_string(
+    value: str, expected: object
+) -> None:
+    assert model._parse_mvdxml_token(value) == expected
+
+
+def test_empty_template_rules_group_is_skipped() -> None:
+    status = rule("AttributeRule", "Status", bind="Status")
+    concept = concept_or_applicability(
+        "status",
+        template("IfcWall", "Status", (status,)),
+        ((), "and", (parse_expression("Status='complete'"),)),
+    )
+
+    valid, _ = concept.validate([{status: "complete"}])
+
+    assert valid
+
+
+def test_every_template_rule_expression_is_evaluated() -> None:
+    status = rule("AttributeRule", "Status", bind="Status")
+    concept = concept_or_applicability(
+        "status",
+        template("IfcWall", "Status", (status,)),
+        (parse_expression("Status='complete'; Status='draft'"),),
+    )
+
+    valid, _ = concept.validate([{status: "complete"}])
+
+    assert not valid
+
+
+def test_official_reference_view_expressions_all_parse() -> None:
+    roots = parse(EXAMPLES / "officials" / "ReferenceView_V1-2.mvdxml")
+
+    tokens = [
+        token
+        for root in roots
+        for concept in root.concepts()
+        for expression in model._iter_expressions(concept.rules())
+        for token in expression
+        if not isinstance(token, str)
+    ]
+
+    assert len(tokens) > 400
+    for token in tokens:
+        model._parse_mvdxml_token(token.c)
