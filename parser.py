@@ -19,10 +19,9 @@ def _elements(node: Element) -> list[Element]:
 class _parser:
     def __init__(self, dom: Document):
         self.dom = dom
-        self.templates = {
-            node.attributes["uuid"].value: node
-            for node in dom.getElementsByTagNameNS("*", "ConceptTemplate")
-        }
+        self.templates: dict[str, Element] = {}
+        for node in dom.getElementsByTagNameNS("*", "ConceptTemplate"):
+            self.templates.setdefault(node.attributes["uuid"].value.casefold(), node)
 
     def parse_template(
         self,
@@ -30,27 +29,33 @@ class _parser:
         constraints: tuple[Any, ...] = (),
         visited: frozenset[str] = frozenset(),
     ) -> template:
+        template_key = template_id.casefold()
         try:
-            root = self.templates[template_id]
+            root = self.templates[template_key]
         except KeyError as error:
             raise ValueError(
                 f"Unknown ConceptTemplate reference: {template_id}"
             ) from error
 
-        if template_id in visited:
+        if template_key in visited:
             raise ValueError(f"Recursive ConceptTemplate reference: {template_id}")
 
         parsed_rules: list[rule] = []
-        next_visited = visited | {template_id}
+        next_visited = visited | {template_key}
         for rules_node in root.getElementsByTagNameNS("*", "Rules"):
             for node in _elements(rules_node):
                 parsed_rules.append(self.parse_rule(node, visited=next_visited))
 
         return template(
-            entity=str(root.attributes["applicableEntity"].value),
+            entity=(
+                str(root.attributes["applicableEntity"].value)
+                if "applicableEntity" in root.attributes
+                else ""
+            ),
             name=root.attributes["name"].value if "name" in root.attributes else None,
             rules=tuple(parsed_rules),
             constraints=constraints,
+            uuid=root.attributes["uuid"].value,
         )
 
     def parse_rule(
@@ -92,17 +97,18 @@ class _parser:
             attribute = node.attributes["EntityName"].value
         elif node.localName == "Template":
             reference = node.attributes["ref"].value
-            if reference in visited:
+            reference_key = reference.casefold()
+            if reference_key in visited:
                 return ()
             try:
-                target = self.templates[reference]
+                target = self.templates[reference_key]
             except KeyError as error:
                 raise ValueError(
                     f"Unknown ConceptTemplate reference: {reference}"
                 ) from error
             if "IdPrefix" in node.attributes:
                 child_prefix += node.attributes["IdPrefix"].value
-            visited = visited | {reference}
+            visited = visited | {reference_key}
         elif node.localName == "Constraint":
             attribute = mvdxml_expression.parse(node.attributes["Expression"].value)
         elif node.localName in {
@@ -214,8 +220,14 @@ class _parser:
         return concept_root(name, entity, concepts, applicability)
 
 
-def parse(source: str | os.PathLike[str]) -> tuple[concept_root | template, ...]:
-    """Parse an mvdXML document into immutable model objects."""
+def parse(
+    source: str | os.PathLike[str], *, include_templates: bool = False
+) -> tuple[concept_root | template, ...]:
+    """Parse an mvdXML document into immutable model objects.
+
+    With ``include_templates=True``, standalone template definitions precede
+    any concept roots in the returned tuple.
+    """
 
     try:
         dom = minidom.parse(os.fspath(source))
@@ -226,12 +238,16 @@ def parse(source: str | os.PathLike[str]) -> tuple[concept_root | template, ...]
 
     parser = _parser(dom)
     roots = dom.getElementsByTagNameNS("*", "ConceptRoot")
-    if roots:
-        return tuple(parser.parse_root(root) for root in roots)
+    parsed_roots = tuple(parser.parse_root(root) for root in roots)
+    if roots and not include_templates:
+        return parsed_roots
 
+    parsed_templates = tuple(
+        parser.parse_template(template_id) for template_id in parser.templates
+    )
+    if include_templates:
+        return parsed_templates + parsed_roots
     if parser.templates:
-        return tuple(
-            parser.parse_template(template_id) for template_id in parser.templates
-        )
+        return parsed_templates
 
     raise ValueError("mvdXML document contains no ConceptRoot or ConceptTemplate")

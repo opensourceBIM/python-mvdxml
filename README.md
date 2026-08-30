@@ -126,13 +126,37 @@ initialize a geometry backend or require a spreadsheet dependency.
 Inspect a document:
 
 ```console
-python -m ifcopenshell.mvd mvd_examples/wall_extraction.mvdxml
+python -m ifcopenshell.mvd inspect mvd_examples/wall_extraction.mvdxml
+```
+
+Validate an IFC file against an mvdXML document:
+
+```console
+python -m ifcopenshell.mvd validate model.mvdxml model.ifc
 ```
 
 Generate and execute SPARQL against an IFC-OWL Turtle file:
 
 ```console
-python -m ifcopenshell.mvd model.mvdxml model.ttl
+python -m ifcopenshell.mvd convert model.mvdxml model.ttl
 ```
+
+Extract a ConceptTemplate, ConceptRoot, or Concept within a ConceptRoot:
+
+```console
+python -m ifcopenshell.mvd extract source.mvdxml "Project Context" project-context.mvdxml
+python -m ifcopenshell.mvd extract source.mvdxml IfcZone zone.mvdxml
+python -m ifcopenshell.mvd extract source.mvdxml "IfcZone/Property Sets for Objects" zone-psets.mvdxml
+```
+
+Combine two or more documents (the final argument is the output path):
+
+```console
+python -m ifcopenshell.mvd combine first.mvdxml second.mvdxml combined.mvdxml
+```
+
+Both commands operate on the immutable objects returned by `parse()`, then pass
+the selected or concatenated objects to `serialize()`. Output contains one
+flattened definition per ConceptTemplate UUID.
 
 Use `python -m ifcopenshell.mvd --help` for argument details.

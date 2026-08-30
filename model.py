@@ -6,7 +6,7 @@ import ast
 import io
 import itertools
 import operator
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from functools import partial, reduce
 from typing import Any, Callable, Iterable, Iterator, Mapping
 
@@ -132,15 +132,22 @@ class rule:
             try:
                 values_from_attribute = getattr(ifc_data, self.attribute)
             except (AttributeError, TypeError):
-                return [{self: "Invalid attribute rule"}]
+                return []
 
-            if values_from_attribute is None:
-                return [{self: "Nonexistent value"}]
+            if values_from_attribute is None or (
+                isinstance(values_from_attribute, (list, tuple))
+                and len(values_from_attribute) == 0
+            ):
+                return []
 
             if isinstance(values_from_attribute, (list, tuple)):
-                if not values_from_attribute:
-                    return [{self: "empty data structure"}]
-                values = values_from_attribute
+                if any(isinstance(v, (list, tuple)) for v in values_from_attribute):
+                    # currently untested: nested lists (bspline surface points)
+                    values = type(values_from_attribute)(
+                        itertools.chain.from_iterable(values_from_attribute)
+                    )
+                else:
+                    values = values_from_attribute
             else:
                 values = (values_from_attribute,)
 
@@ -186,6 +193,7 @@ class template:
     name: str | None
     rules: tuple[rule, ...] = ()
     constraints: tuple[Any, ...] = ()
+    uuid: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "rules", tuple(self.rules))
@@ -230,7 +238,7 @@ class template:
 
     def root_rule(self) -> rule:
         if not self.rules:
-            raise ValueError(f"Template {self.name or self.entity!r} contains no rules")
+            return rule("EntityRule", self.entity)
         if len(self.rules) == 1:
             return self.rules[0]
         return rule("EntityRule", self.entity, self.rules)
@@ -405,3 +413,54 @@ class concept_root:
             for global_id, values in verification.items()
             if sum(values.values()) == 0
         ]
+
+
+mvd_item = concept_root | template
+
+
+def _without_empty_applicability(root: concept_root) -> concept_root:
+    applicability = root.parsed_applicability
+    if applicability is not None and not applicability.template().rules:
+        return replace(root, parsed_applicability=None)
+    return root
+
+
+def filter(items: Iterable[mvd_item], selector: str) -> tuple[mvd_item, ...]:
+    """Select a template, root, or ``root/concept`` from parsed mvdXML items."""
+
+    parsed = tuple(items)
+    if "/" in selector:
+        root_name, concept_name = selector.split("/", 1)
+        roots = [
+            item
+            for item in parsed
+            if isinstance(item, concept_root) and item.name == root_name
+        ]
+        matches = [
+            (root, concept)
+            for root in roots
+            for concept in root.concepts()
+            if concept.name == concept_name
+        ]
+        if len(matches) != 1:
+            raise ValueError(
+                f"Expected one Concept named {selector!r}, found {len(matches)}"
+            )
+        root, concept = matches[0]
+        return (
+            replace(_without_empty_applicability(root), parsed_concepts=(concept,)),
+        )
+
+    templates: dict[str | int, template] = {}
+    for item in parsed:
+        if isinstance(item, template) and item.name == selector:
+            templates.setdefault(item.uuid.casefold() if item.uuid else id(item), item)
+    roots = [
+        _without_empty_applicability(item)
+        for item in parsed
+        if isinstance(item, concept_root) and item.name == selector
+    ]
+    matches: list[mvd_item] = [*templates.values(), *roots]
+    if len(matches) != 1:
+        raise ValueError(f"Expected one item named {selector!r}, found {len(matches)}")
+    return (matches[0],)
