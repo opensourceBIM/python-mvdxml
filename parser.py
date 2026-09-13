@@ -42,9 +42,16 @@ class _parser:
 
         parsed_rules: list[rule] = []
         next_visited = visited | {template_key}
-        for rules_node in root.getElementsByTagNameNS("*", "Rules"):
+        # Only the template's own <Rules> are in scope. Nested <SubTemplates>
+        # form a hierarchy of separate templates, so they must not contribute
+        # rules (and therefore entity scope) to the parent template.
+        for rules_node in _elements(root):
+            if rules_node.localName != "Rules":
+                continue
             for node in _elements(rules_node):
-                parsed_rules.append(self.parse_rule(node, visited=next_visited))
+                # A <References> child unions one or more <Template>
+                # references, so a single child may expand to several rules.
+                parsed_rules.extend(self._visit_rule(node, "", next_visited))
 
         return template(
             entity=(
@@ -57,19 +64,6 @@ class _parser:
             constraints=constraints,
             uuid=root.attributes["uuid"].value,
         )
-
-    def parse_rule(
-        self,
-        root: Element,
-        prefix: str = "",
-        visited: frozenset[str] = frozenset(),
-    ) -> rule:
-        parsed = self._visit_rule(root, prefix, visited)
-        if len(parsed) != 1:
-            raise ValueError(
-                f"Expected one rule below {root.localName}, found {len(parsed)}"
-            )
-        return parsed[0]
 
     def _visit_rule(
         self,
