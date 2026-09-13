@@ -24,7 +24,7 @@ class node:
 
 
 word = pp.Word(pp.alphanums + "_" + " " + "/" + "#")
-quoted = pp.Combine("'" + word + "'")
+quoted = pp.Combine("'" + pp.Optional(word) + "'")
 bool_value = pp.CaselessLiteral("TRUE") | pp.CaselessLiteral("FALSE")
 ref_val = word + "[" + word + "]"
 rhs = quoted | bool_value | ref_val | word
