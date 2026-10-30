@@ -59,9 +59,12 @@ def withschema(fn):
 
     def _(*args, **kwargs):
         schema_name = STANDARD_PREFIXES["ifcowl"].split("/")[-1][:-2]
-        if "_" in schema_name:
-            schema_name = schema_name.split("_")[0]
-        S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name)
+        try:
+            S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name)
+        except RuntimeError:
+            if "_" not in schema_name:
+                raise
+            S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name.split("_")[0])
         return fn(S, *args, **kwargs)
 
     return _

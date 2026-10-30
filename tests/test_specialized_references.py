@@ -247,7 +247,7 @@ def test_references_chained_entities_and_direct_attribute_entities_are_equivalen
     comparing actual extracted bindings and SPARQL rows, not only match flags.
     """
     monkeypatch.setitem(
-        sparql.STANDARD_PREFIXES, "ifcowl", "<http://example.org/IFC4X3#>"
+        sparql.STANDARD_PREFIXES, "ifcowl", "<http://example.org/IFC4X3_ADD2#>"
     )
     extraction = {}
     query_results = {}
@@ -363,7 +363,7 @@ concept {
 
 def owl_graph(model):
     graph = Graph()
-    owl = Namespace("http://example.org/IFC4X3#")
+    owl = Namespace("http://example.org/IFC4X3_ADD2#")
     inst = Namespace("http://example.org/instances/")
     express = Namespace("https://w3id.org/express#")
     schema = ifcopenshell.schema_by_name("IFC4X3_ADD2")
@@ -399,7 +399,7 @@ def test_sparql_executes_specialized_type_filter(
     tmp_path, geometry_models, monkeypatch, revolved, leaf
 ):
     monkeypatch.setitem(
-        sparql.STANDARD_PREFIXES, "ifcowl", "<http://example.org/IFC4X3#>"
+        sparql.STANDARD_PREFIXES, "ifcowl", "<http://example.org/IFC4X3_ADD2#>"
     )
     parsed = body_template(tmp_path, revolved=revolved, leaf=leaf)
     query = sparql.convertor.template(parsed)
