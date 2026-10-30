@@ -365,6 +365,18 @@ class convertor(object):
                 return_value = lambda: bld.append(INDENT + "}")
 
             if rule.tag == "EntityRule":
+                siblings = [
+                    child
+                    for child in getattr(parents[-1], "nodes", ())
+                    if child.tag == "EntityRule"
+                ]
+                if len(siblings) > 1:
+                    bld.append(INDENT + "{")
+
+                    def close_alternative():
+                        bld.append(INDENT + ("} UNION" if rule is not siblings[-1] else "}"))
+
+                    return_value = close_alternative
                 # G.nm = G.next_nm
 
                 if not ifcOwl.is_select(rule.attribute):

@@ -28,6 +28,13 @@ concept templates returns a tuple of `template` objects instead. Invalid XML
 and missing template references raise `ValueError` with the relevant document
 or template identifier. Recursive template branches are expanded once.
 
+When a referenced template's `applicableEntity` differs from its anchor entity,
+the parsed tree includes an additional `EntityRule` for that type. Consecutive
+entity rules apply to the same IFC instance; sibling entity rules are alternative
+specializations. Matching roots are expanded without an extra rule. This keeps
+type restrictions visible to traversal, extraction and SPARQL conversion.
+Serialization writes these restrictions as partial-template references again.
+
 ### Graphviz concept templates
 
 The lightweight concept graphs used by the buildingSMART IFC4.x documentation

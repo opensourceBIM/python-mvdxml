@@ -42,6 +42,7 @@ class _parser:
 
         parsed_rules: list[rule] = []
         next_visited = visited | {template_key}
+        entity = root.getAttribute("applicableEntity")
         # Only the template's own <Rules> are in scope. Nested <SubTemplates>
         # form a hierarchy of separate templates, so they must not contribute
         # rules (and therefore entity scope) to the parent template.
@@ -51,7 +52,7 @@ class _parser:
             for node in _elements(rules_node):
                 # A <References> child unions one or more <Template>
                 # references, so a single child may expand to several rules.
-                parsed_rules.extend(self._visit_rule(node, "", next_visited))
+                parsed_rules.extend(self._visit_rule(node, "", next_visited, entity))
 
         return template(
             entity=(
@@ -70,12 +71,14 @@ class _parser:
         node: Element,
         prefix: str,
         visited: frozenset[str],
+        anchor: str,
     ) -> tuple[rule, ...]:
         attribute: Any = None
         bind: str | None = None
         optional = False
         target = node
         child_prefix = prefix
+        tag = node.localName
 
         if node.localName == "AttributeRule":
             attribute = node.attributes["AttributeName"].value
@@ -89,6 +92,7 @@ class _parser:
                 )
         elif node.localName == "EntityRule":
             attribute = node.attributes["EntityName"].value
+            anchor = attribute
         elif node.localName == "Template":
             reference = node.attributes["ref"].value
             reference_key = reference.casefold()
@@ -103,6 +107,13 @@ class _parser:
             if "IdPrefix" in node.attributes:
                 child_prefix += node.attributes["IdPrefix"].value
             visited = visited | {reference_key}
+            entity = target.getAttribute("applicableEntity")
+            if entity and entity.casefold() != anchor.casefold():
+                # A reference may specialize its anchor without following an
+                # attribute. Keep that type restriction in the rule tree.
+                tag = "EntityRule"
+                attribute = entity
+                anchor = entity
         elif node.localName == "Constraint":
             attribute = mvdxml_expression.parse(node.attributes["Expression"].value)
         elif node.localName in {
@@ -121,13 +132,13 @@ class _parser:
         children = tuple(
             parsed
             for child in _elements(target)
-            for parsed in self._visit_rule(child, child_prefix, visited)
+            for parsed in self._visit_rule(child, child_prefix, visited, anchor)
         )
 
         if attribute is not None:
             return (
                 rule(
-                    tag=node.localName,
+                    tag=tag,
                     attribute=attribute,
                     nodes=children,
                     bind=child_prefix + bind if bind else None,

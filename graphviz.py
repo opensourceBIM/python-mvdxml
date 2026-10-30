@@ -76,15 +76,18 @@ def parse(
     root = min(graph.in_degree(), key=lambda item: item[1])[0]
     resolved_references = _reference_lookup(references or {})
 
-    def build(node: str, top_level_attribute: bool = False) -> tuple[rule, ...]:
+    def build(node: str, top_level_attribute: bool = False, anchor: str = "") -> tuple[rule, ...]:
         node_type = graph.nodes[node].get("type", "EntityRule")
         if node_type == "Reference":
             try:
-                return resolved_references[_normalise_reference(node)].rules
+                referenced = resolved_references[_normalise_reference(node)]
             except KeyError as error:
                 raise ValueError(
                     f"Unknown Graphviz template reference: {node}"
                 ) from error
+            if referenced.entity and referenced.entity.casefold() != anchor.casefold():
+                return (rule("EntityRule", referenced.entity, referenced.rules),)
+            return referenced.rules
 
         if node_type == "Constraint":
             try:
@@ -99,6 +102,7 @@ def parse(
             itertools.chain.from_iterable(
                 build(
                     child,
+                    anchor=node.split("_", 1)[0] if node_type == "EntityRule" else anchor,
                     top_level_attribute=(
                         node == root
                         and graph.nodes[child].get("type") == "AttributeRule"

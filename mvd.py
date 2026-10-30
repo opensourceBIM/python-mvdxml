@@ -1,5 +1,6 @@
 import ifcopenshell
 import ifcopenshell.geom
+from .model import rule
 
 import itertools
 import os
@@ -36,6 +37,9 @@ def extract_data(mvd_node, ifc_data):
 
 
     """
+    if isinstance(mvd_node, rule):
+        return mvd_node.extract(ifc_data)
+
     to_combine = []
     return_value = []
 
