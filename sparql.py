@@ -59,9 +59,12 @@ def withschema(fn):
 
     def _(*args, **kwargs):
         schema_name = STANDARD_PREFIXES["ifcowl"].split("/")[-1][:-2]
-        if "_" in schema_name:
-            schema_name = schema_name.split("_")[0]
-        S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name)
+        try:
+            S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name)
+        except RuntimeError:
+            if "_" not in schema_name:
+                raise
+            S = ifcopenshell.ifcopenshell_wrapper.schema_by_name(schema_name.split("_")[0])
         return fn(S, *args, **kwargs)
 
     return _
@@ -365,6 +368,18 @@ class convertor(object):
                 return_value = lambda: bld.append(INDENT + "}")
 
             if rule.tag == "EntityRule":
+                siblings = [
+                    child
+                    for child in getattr(parents[-1], "nodes", ())
+                    if child.tag == "EntityRule"
+                ]
+                if len(siblings) > 1:
+                    bld.append(INDENT + "{")
+
+                    def close_alternative():
+                        bld.append(INDENT + ("} UNION" if rule is not siblings[-1] else "}"))
+
+                    return_value = close_alternative
                 # G.nm = G.next_nm
 
                 if not ifcOwl.is_select(rule.attribute):
