@@ -167,7 +167,22 @@ class rule:
                 return []
 
             to_combine: list[extracted_data] = []
+            # Sibling entity rules represent alternative specializations of
+            # this instance, just as entity rules under an attribute do.
+            entity_alternatives = [
+                child for child in self.nodes if child.tag == "EntityRule"
+            ]
+            if entity_alternatives:
+                to_combine.append(
+                    [
+                        values
+                        for child in entity_alternatives
+                        for values in child.extract(ifc_data)
+                    ]
+                )
             for child in self.nodes:
+                if child.tag == "EntityRule":
+                    continue
                 if child.tag == "Constraint":
                     on_node = child.attribute[0][0].c.replace("'", "")
                     if isinstance(ifc_data, ifcopenshell.entity_instance):
@@ -249,12 +264,18 @@ class template:
     def binding_for(self, target: rule) -> str | None:
         binding: str | None = None
 
-        def find(rule: rule, parent: rule | None) -> None:
+        def find(rule: rule, parents: tuple[rule | None, ...]) -> None:
             nonlocal binding
             if rule is target:
-                binding = rule.bind or (parent.bind if parent else None)
+                binding = rule.bind
+                for parent in reversed(parents):
+                    if binding or parent is None:
+                        break
+                    binding = parent.bind
+                    if parent.tag != "EntityRule":
+                        break
 
-        self.traverse(find)
+        self.traverse(find, with_parents=True)
         return binding
 
 

@@ -52,7 +52,7 @@ _CONTAINERS = {
 }
 
 
-def _rule(parent: ET.Element, value: rule) -> None:
+def _rule(parent: ET.Element, value: rule, referenced: list[tuple[str, template]]) -> None:
     attributes: dict[str, str] = {}
     if value.tag == "AttributeRule":
         attributes = {"AttributeName": str(value.attribute)}
@@ -67,12 +67,30 @@ def _rule(parent: ET.Element, value: rule) -> None:
 
     element = _add(parent, value.tag, **attributes)
     for tag, children in groupby(value.nodes, key=lambda child: child.tag):
+        if value.tag == "EntityRule" and tag == "EntityRule":
+            # Consecutive entity rules are an in-memory type restriction.
+            # Write them as partial-template references in mvdXML.
+            container = _add(element, "References")
+            for child in children:
+                identifier = str(uuid.uuid4())
+                _add(container, "Template", ref=identifier)
+                referenced.append(
+                    (identifier, template(child.attribute, None, child.nodes))
+                )
+            continue
         container = _add(element, _CONTAINERS[tag])
         for child in children:
-            _rule(container, child)
+            _rule(container, child, referenced)
 
 
-def _template(parent: ET.Element, value: template, identifier: str) -> None:
+def _template(
+    parent: ET.Element,
+    value: template,
+    identifier: str,
+    referenced: list[tuple[str, template]],
+    *,
+    partial: bool = False,
+) -> None:
     element = _add(
         parent,
         "ConceptTemplate",
@@ -81,11 +99,12 @@ def _template(parent: ET.Element, value: template, identifier: str) -> None:
         status="sample",
         applicableSchema="IFC4",
         applicableEntity=value.entity,
+        isPartial="true" if partial else None,
     )
     if value.rules:
         rules = _add(element, "Rules")
         for item in value.rules:
-            _rule(rules, item)
+            _rule(rules, item, referenced)
 
 
 def _key(value: template) -> str | int:
@@ -138,8 +157,15 @@ def serialize(items: Iterable[mvd_item], destination: str | Path) -> None:
         {"uuid": str(uuid.uuid4()), "name": "", "status": "sample"},
     )
     template_elements = _add(document, "Templates")
+    referenced: list[tuple[str, template]] = []
     for key, value in templates.items():
-        _template(template_elements, value, template_ids[key])
+        _template(template_elements, value, template_ids[key], referenced)
+    # Serializing a partial template can discover further specializations.
+    index = 0
+    while index < len(referenced):
+        identifier, value = referenced[index]
+        _template(template_elements, value, identifier, referenced, partial=True)
+        index += 1
 
     roots = [item for item in parsed if isinstance(item, concept_root)]
     if roots:
